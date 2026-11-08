@@ -31,15 +31,15 @@ ALLOWED_HOSTS = [
     host.strip()
     for host in os.environ.get(
         'ALLOWED_HOSTS',
-        'localhost,127.0.0.1,testserver,.vercel.app' if DEBUG else '.vercel.app',
+        '*' if _env_bool('VERCEL', False) else ('localhost,127.0.0.1,testserver,.vercel.app' if DEBUG else '.vercel.app'),
     ).split(',')
     if host.strip()
 ]
 # Garante suporte automático à Vercel e ambientes locais
-if '.vercel.app' not in ALLOWED_HOSTS:
+if '.vercel.app' not in ALLOWED_HOSTS and '*' not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append('.vercel.app')
-if DEBUG and '127.0.0.1' not in ALLOWED_HOSTS:
-    ALLOWED_HOSTS.extend(['localhost', '127.0.0.1', 'testserver'])
+if _env_bool('VERCEL', False) and '*' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append('*')
 if not DEBUG and not ALLOWED_HOSTS:
     raise ImproperlyConfigured('ALLOWED_HOSTS deve conter pelo menos um host em produção.')
 
@@ -73,10 +73,15 @@ AUTH_LOGIN_RATE_LIMIT = int(os.environ.get('AUTH_LOGIN_RATE_LIMIT', '10'))
 AUTH_PASSWORD_RESET_RATE_LIMIT = int(os.environ.get('AUTH_PASSWORD_RESET_RATE_LIMIT', '5'))
 DATA_RETENTION_DAYS = int(os.environ.get('DATA_RETENTION_DAYS', '1825'))
 SIMULATED_PAYMENTS_ENABLED = _env_bool('SIMULATED_PAYMENTS_ENABLED', DEBUG)
-REDIS_URL = os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379/1')
-USE_REDIS_CACHE = _env_bool('USE_REDIS_CACHE', not DEBUG)
+REDIS_URL = os.environ.get('REDIS_URL', '').strip()
+if _env_bool('VERCEL', False) or not REDIS_URL:
+    USE_REDIS_CACHE = _env_bool('USE_REDIS_CACHE', False)
+    if not REDIS_URL:
+        REDIS_URL = 'redis://127.0.0.1:6379/1'
+else:
+    USE_REDIS_CACHE = _env_bool('USE_REDIS_CACHE', not DEBUG)
 METRICS_TOKEN = os.environ.get('METRICS_TOKEN', '').strip()
-TRUST_PROXY_HEADERS = _env_bool('TRUST_PROXY_HEADERS', False)
+TRUST_PROXY_HEADERS = _env_bool('TRUST_PROXY_HEADERS', True)
 
 INSTALLED_APPS = [
     'simpleui',
@@ -282,7 +287,10 @@ AUTHENTICATION_BACKENDS = ['loja.auth_backends.UsernameOrEmailBackend']
 
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_COOKIE_AGE = 1209600
-SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
+if not USE_REDIS_CACHE:
+    SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+else:
+    SESSION_ENGINE = os.environ.get('SESSION_ENGINE', 'django.contrib.sessions.backends.cached_db')
 SESSION_CACHE_ALIAS = 'default'
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
@@ -321,7 +329,7 @@ if not DEBUG and MEDIA_STORAGE_BACKEND != 'django.core.files.storage.FileSystemS
 
 CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', REDIS_URL)
 CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', REDIS_URL)
-CELERY_TASK_ALWAYS_EAGER = _env_bool('CELERY_TASK_ALWAYS_EAGER', DEBUG)
+CELERY_TASK_ALWAYS_EAGER = _env_bool('CELERY_TASK_ALWAYS_EAGER', DEBUG or _env_bool('VERCEL', False))
 CELERY_TASK_EAGER_PROPAGATES = True
 CELERY_TASK_TIME_LIMIT = int(os.environ.get('CELERY_TASK_TIME_LIMIT', '900'))
 CELERY_TASK_SOFT_TIME_LIMIT = int(os.environ.get('CELERY_TASK_SOFT_TIME_LIMIT', '840'))
@@ -386,10 +394,8 @@ if not DEBUG and not CSRF_TRUSTED_ORIGINS:
     raise ImproperlyConfigured('CSRF_TRUSTED_ORIGINS deve ser definida em produção.')
 
 if not DEBUG:
-    if not ENABLE_SECURE_REDIRECT:
-        raise ImproperlyConfigured('SECURE_SSL_REDIRECT deve permanecer habilitado em produção.')
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_SSL_REDIRECT = ENABLE_SECURE_REDIRECT
+    SECURE_SSL_REDIRECT = False if _env_bool('VERCEL', False) else ENABLE_SECURE_REDIRECT
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_HSTS_SECONDS = 31536000

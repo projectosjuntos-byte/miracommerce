@@ -13,3 +13,4 @@ from django.core.wsgi import get_wsgi_application
 # Vercel Serverless Function handler
 app = get_wsgi_application()
 application = app
+handler = app
