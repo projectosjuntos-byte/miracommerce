@@ -1,0 +1,49 @@
+======================================================================
+MIRACOMERCE IA — ATUALIZAÇÃO DO PEDIDO {{ codigo_pedido }}
+======================================================================
+
+Olá, {{ pedido.usuario.get_full_name|default:pedido.usuario.username }}!
+
+{{ meta.titulo }}
+Estado Atual: [ {{ meta.badge_label }} ]
+
+{{ meta.mensagem }}
+
+----------------------------------------------------------------------
+PRÓXIMA ETAPA:
+{{ meta.proximo_passo }}
+----------------------------------------------------------------------
+
+ACOMPANHAR RASTREIO EM TEMPO REAL:
+{{ url_rastreio }}
+
+======================================================================
+EVOLUÇÃO DA ENTREGA:
+======================================================================
+{% for etapa in etapas %}
+- [{{ etapa.estado|upper }}] {{ etapa.titulo }}: {{ etapa.descricao }}{% if etapa.data_hora %} ({{ etapa.data_hora|date:"d/m/Y H:i" }}){% endif %}
+{% endfor %}
+
+======================================================================
+ARTIGOS DO PEDIDO:
+======================================================================
+{% for item in itens %}
+* {{ item.produto.nome }}
+  Quantidade: {{ item.quantidade }} | Preço Unitário: {{ item.preco_unitario|floatformat:2 }} Kz | Subtotal: {{ item.subtotal|floatformat:2 }} Kz
+{% endfor %}
+
+Subtotal:          {{ subtotal_formatado }}
+Taxa de Entrega:   {{ frete_formatado }}
+Total do Pedido:   {{ total_formatado }}
+
+======================================================================
+ENDEREÇO DE ENTREGA:
+======================================================================
+Destinatário: {{ pedido.usuario.get_full_name|default:pedido.usuario.username }}
+{% if perfil and perfil.bairro %}{{ perfil.bairro }}, {{ perfil.municipio|default:"" }} - {{ perfil.provincia|default:"" }}{% else %}Endereço registrado na conta do cliente.{% endif %}
+{% if perfil and perfil.telefone %}Contacto: {{ perfil.telefone }}{% endif %}
+
+----------------------------------------------------------------------
+Data da Notificação: {{ data_atual }}
+MiraComerce IA • Luanda, Angola • Mensagem automática de acompanhamento.
+

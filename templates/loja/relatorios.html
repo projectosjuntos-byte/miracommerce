@@ -1,0 +1,286 @@
+{% extends 'loja/base.html' %}
+{% block title %}Relatório de Vendas &amp; Transações — MiraComerce IA{% endblock %}
+
+{% block extra_css %}
+<style nonce="{{ request.csp_nonce }}">
+    .report-wrap {
+        width: min(1200px, calc(100% - 2rem));
+        margin: 0 auto;
+        padding: 2.5rem 0 4rem;
+    }
+    .report-card {
+        background: var(--mira-ink-raised);
+        border: 1px solid var(--mira-line);
+        border-radius: var(--mira-radius);
+    }
+    .kpi-box {
+        padding: 1.2rem;
+        background: var(--mira-ink-raised);
+        border: 1px solid var(--mira-line);
+        border-radius: var(--mira-radius);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .kpi-box.accent {
+        background: linear-gradient(135deg, rgba(230, 115, 21, 0.16), rgba(241, 230, 130, 0.06));
+        border-color: var(--mira-accent);
+    }
+    .kpi-box span {
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--mira-muted);
+    }
+    .kpi-box strong {
+        display: block;
+        font-size: 1.65rem;
+        letter-spacing: -0.04em;
+        margin: 0.35rem 0 0.15rem;
+        color: var(--mira-paper);
+    }
+    .kpi-box.accent strong {
+        color: var(--primary-orange);
+    }
+    .kpi-box small {
+        font-size: 0.74rem;
+        color: var(--mira-muted);
+    }
+    .report-table th {
+        font-size: 0.74rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--mira-muted);
+        border-bottom: 2px solid var(--mira-line);
+        padding: 0.85rem 0.75rem;
+        background: rgba(255, 255, 255, 0.02);
+    }
+    .report-table td {
+        padding: 0.8rem 0.75rem;
+        vertical-align: middle;
+        border-bottom: 1px solid var(--mira-line);
+        color: var(--mira-paper);
+    }
+    .report-table tr:hover td {
+        background: rgba(255, 255, 255, 0.03);
+    }
+    .report-table tfoot td {
+        background: rgba(230, 115, 21, 0.12);
+        font-weight: 700;
+        border-top: 2px solid var(--primary-orange);
+        color: var(--mira-paper);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="report-wrap">
+    <!-- CABEÇALHO -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-warning text-dark fw-bold">BI &amp; AUDITORIA</span>
+                <span class="text-muted small">Gestão Comercial</span>
+            </div>
+            <h1 class="h2 fw-bold mb-1 text-white">Relatório Analítico de Vendas</h1>
+            <p class="text-muted mb-0 small">Acompanhe faturamento, volume de saída, clientes e transações consolidadas.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-warning btn-sm" href="{% url 'home' %}">
+                <i class="fas fa-arrow-left me-1" aria-hidden="true"></i>Voltar ao Painel
+            </a>
+            <a class="btn btn-warning btn-sm fw-bold text-dark" href="/admin/" target="_blank">
+                <i class="fas fa-screwdriver-wrench me-1" aria-hidden="true"></i>Django Admin
+            </a>
+        </div>
+    </div>
+
+    <!-- CARDS DE KPIS EXECUTIVOS -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="kpi-box accent">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>Faturamento Total</span>
+                    <i class="fas fa-coins text-warning" aria-hidden="true"></i>
+                </div>
+                <strong>{{ resumo.total_receita_formatado|default:"0,00 Kz" }}</strong>
+                <small>Receita bruta no período</small>
+            </div>
+        </div>
+        <div class="col-6 col-sm-6 col-lg-3">
+            <div class="kpi-box">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>Transações</span>
+                    <i class="fas fa-receipt text-muted" aria-hidden="true"></i>
+                </div>
+                <strong>{{ resumo.total_transacoes|default:0 }}</strong>
+                <small>Pedidos distintos</small>
+            </div>
+        </div>
+        <div class="col-6 col-sm-6 col-lg-3">
+            <div class="kpi-box">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>Artigos Vendidos</span>
+                    <i class="fas fa-boxes-packing text-muted" aria-hidden="true"></i>
+                </div>
+                <strong>{{ resumo.total_itens|default:0 }}</strong>
+                <small>Unidades físicas de saída</small>
+            </div>
+        </div>
+        <div class="col-6 col-sm-6 col-lg-3">
+            <div class="kpi-box">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>Ticket Médio</span>
+                    <i class="fas fa-chart-pie text-muted" aria-hidden="true"></i>
+                </div>
+                <strong style="font-size: 1.35rem;">{{ resumo.ticket_medio_formatado|default:"0,00 Kz" }}</strong>
+                <small>Média por transação</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- FILTROS POR PERÍODO -->
+    <section class="report-card p-4 mb-4" aria-labelledby="filtros-titulo">
+        <h2 id="filtros-titulo" class="h6 text-uppercase fw-bold text-warning mb-3">
+            <i class="fas fa-filter me-2" aria-hidden="true"></i>Filtrar Período de Análise
+        </h2>
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-12 col-md-4">
+                <label for="id_inicio" class="form-label small text-muted">Data Inicial</label>
+                <input id="id_inicio" name="inicio" type="date" class="form-control bg-dark text-white border-secondary" value="{{ inicio|date:'Y-m-d' }}" autocomplete="off">
+            </div>
+            <div class="col-12 col-md-4">
+                <label for="id_fim" class="form-label small text-muted">Data Final</label>
+                <input id="id_fim" name="fim" type="date" class="form-control bg-dark text-white border-secondary" value="{{ fim|date:'Y-m-d' }}" autocomplete="off">
+            </div>
+            <div class="col-12 col-md-4 d-flex gap-2">
+                <button class="btn btn-warning fw-bold text-dark flex-grow-1" type="submit">
+                    <i class="fas fa-magnifying-glass me-1" aria-hidden="true"></i>Aplicar Filtros
+                </button>
+                <a class="btn btn-outline-secondary" href="{% url 'relatorio_vendas' %}">Limpar</a>
+            </div>
+        </form>
+    </section>
+
+    <!-- BARRA DE EXPORTAÇÃO & STATUS -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+        <p class="mb-0 small text-muted" aria-live="polite">
+            <i class="fas fa-list-check me-1 text-warning" aria-hidden="true"></i>
+            <strong>{{ total_registros }}</strong> linha{{ total_registros|pluralize:"s" }} de venda consolidada{{ total_registros|pluralize:"s" }}.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-sm btn-outline-danger fw-bold" href="{% url 'exportar_relatorio_vendas' 'pdf' %}?{{ request.GET.urlencode }}" title="Baixar relatório executivo em PDF">
+                <i class="fas fa-file-pdf me-1" aria-hidden="true"></i>PDF Executivo
+            </a>
+            <a class="btn btn-sm btn-outline-success fw-bold" href="{% url 'exportar_relatorio_vendas' 'excel' %}?{{ request.GET.urlencode }}" title="Exportar planilha Excel">
+                <i class="fas fa-file-excel me-1" aria-hidden="true"></i>Excel
+            </a>
+            <a class="btn btn-sm btn-outline-secondary fw-bold" href="{% url 'exportar_relatorio_vendas' 'csv' %}?{{ request.GET.urlencode }}" title="Exportar dados brutos em CSV">
+                <i class="fas fa-file-csv me-1" aria-hidden="true"></i>CSV
+            </a>
+        </div>
+    </div>
+
+    <!-- TABELA ANALÍTICA DE VENDAS -->
+    <div class="table-responsive report-card mb-4">
+        <table class="table report-table align-middle mb-0">
+            <caption class="visually-hidden">Vendas consolidadas no período</caption>
+            <thead>
+                <tr>
+                    <th scope="col" class="text-center" style="width: 120px;">Transação</th>
+                    <th scope="col" style="width: 150px;">Data &amp; Hora</th>
+                    <th scope="col">Cliente</th>
+                    <th scope="col">Produto</th>
+                    <th scope="col" class="text-center" style="width: 70px;">Qtd</th>
+                    <th scope="col" class="text-end" style="width: 140px;">Preço Unit. (Kz)</th>
+                    <th scope="col" class="text-end" style="width: 150px;">Subtotal (Kz)</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in pagina %}
+                <tr>
+                    <td class="text-center text-nowrap">
+                        <strong class="text-warning">#{{ item.id_transacao }}</strong>
+                    </td>
+                    <td class="small text-muted text-nowrap">
+                        {{ item.data_venda|date:'d/m/Y H:i' }}
+                    </td>
+                    <td>
+                        <i class="fas fa-user-circle me-1 text-muted" aria-hidden="true"></i>
+                        <strong>{{ item.usuario.get_full_name|default:item.usuario.username }}</strong>
+                    </td>
+                    <td>
+                        <strong>{{ item.produto.nome }}</strong>
+                    </td>
+                    <td class="text-center">
+                        <span class="badge bg-dark border border-secondary text-light px-2 py-1">
+                            {{ item.quantidade|default:1 }}
+                        </span>
+                    </td>
+                    <td class="text-end text-nowrap">
+                        {{ item.preco_unitario|default:item.produto.preco|floatformat:2 }} Kz
+                    </td>
+                    <td class="text-end text-nowrap fw-bold text-white">
+                        {{ item.subtotal|floatformat:2 }} Kz
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-5 text-muted">
+                        <i class="fas fa-receipt fa-2x mb-2 d-block opacity-50" aria-hidden="true"></i>
+                        Nenhuma venda registrada no período informado.
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            {% if resumo and resumo.total_itens %}
+            <tfoot>
+                <tr>
+                    <td colspan="4" class="text-uppercase small fw-bold">
+                        TOTAL GERAL CONSOLIDADO
+                    </td>
+                    <td class="text-center fw-bold">
+                        {{ resumo.total_itens }}
+                    </td>
+                    <td class="text-end text-muted">
+                        —
+                    </td>
+                    <td class="text-end fw-bold text-warning fs-6">
+                        {{ resumo.total_receita_formatado }}
+                    </td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    </div>
+
+    <!-- PAGINAÇÃO -->
+    {% if pagina.paginator.num_pages > 1 %}
+    <nav class="mt-4" aria-label="Paginação do relatório">
+        <ul class="pagination justify-content-center">
+            {% if pagina.has_previous %}
+            <li class="page-item">
+                <a class="page-link bg-dark text-white border-secondary" href="?pagina={{ pagina.previous_page_number }}&inicio={{ inicio|date:'Y-m-d' }}&fim={{ fim|date:'Y-m-d' }}">
+                    <i class="fas fa-chevron-left me-1" aria-hidden="true"></i>Anterior
+                </a>
+            </li>
+            {% endif %}
+            <li class="page-item active" aria-current="page">
+                <span class="page-link bg-warning text-dark fw-bold border-warning">
+                    Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}
+                </span>
+            </li>
+            {% if pagina.has_next %}
+            <li class="page-item">
+                <a class="page-link bg-dark text-white border-secondary" href="?pagina={{ pagina.next_page_number }}&inicio={{ inicio|date:'Y-m-d' }}&fim={{ fim|date:'Y-m-d' }}">
+                    Próxima<i class="fas fa-chevron-right ms-1" aria-hidden="true"></i>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

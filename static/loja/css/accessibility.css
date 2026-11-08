@@ -1,0 +1,9 @@
+:focus-visible { outline: 3px solid #9a4f00; outline-offset: 3px; }
+.skip-link { position: fixed; left: 1rem; top: -5rem; z-index: 3000; padding: .75rem 1rem; background: #fff; color: #1a1d1e; border-radius: .5rem; box-shadow: 0 4px 15px #0004; }
+.skip-link:focus { top: 1rem; }
+html { scroll-behavior: smooth; }
+section, article, h1, h2, h3, h4, h5, h6 { scroll-margin-top: 110px; }
+button, a, input, select, textarea { touch-action: manipulation; }
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+}

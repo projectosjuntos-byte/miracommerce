@@ -1,0 +1,455 @@
+/* ==============================================================================
+   MIRACOMERCE IA - ESTILOS DA PÁGINA INICIAL (HOME & VITRINE)
+   Arquivo: static/loja/css/home.css
+   Contém estilos para o Painel Administrativo da Home e Barra de Controles da Vitrine.
+   ============================================================================== */
+
+/* ------------------------------------------------------------------------------
+   1. PAINEL ADMINISTRATIVO (CENTRAL DE GESTÃO - VISÃO DA OPERAÇÃO)
+   ------------------------------------------------------------------------------ */
+.admin-overview {
+    width: min(1200px, calc(100% - 2rem));
+    margin: 0 auto;
+    padding: 3rem 0 5rem;
+}
+.admin-overview h1 {
+    color: var(--mira-paper);
+    font-weight: 760;
+    letter-spacing: -0.055em;
+}
+.admin-overview p {
+    color: var(--mira-muted);
+}
+
+.admin-metric,
+.admin-panel {
+    border: 1px solid var(--mira-line);
+    border-radius: var(--mira-radius);
+    background: var(--mira-ink-raised);
+}
+
+.admin-metric {
+    min-height: 135px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+}
+.admin-metric:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.admin-metric-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.admin-metric span {
+    color: var(--mira-muted);
+    font-size: .74rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+.admin-metric strong {
+    display: block;
+    margin-top: .4rem;
+    color: var(--mira-paper);
+    font-size: 1.85rem;
+    letter-spacing: -0.05em;
+    line-height: 1.1;
+}
+.admin-metric small {
+    font-size: .74rem;
+    color: var(--mira-muted);
+    margin-top: .4rem;
+    display: block;
+}
+
+.admin-metric.accent {
+    background: linear-gradient(135deg, rgba(230, 115, 21, 0.16), rgba(241, 230, 130, 0.06));
+    border-color: var(--mira-accent);
+}
+.admin-metric.accent span { color: var(--primary-yellow); }
+.admin-metric.accent strong { color: var(--primary-orange); }
+.admin-metric.accent small { color: rgba(241, 230, 130, 0.8); }
+
+/* Atalhos Rápidos da Operação */
+.btn-action-card {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 1rem 1.15rem;
+    background: var(--mira-ink-raised);
+    border: 1px solid var(--mira-line);
+    border-radius: var(--mira-radius);
+    text-decoration: none;
+    color: var(--mira-paper);
+    transition: all 0.2s ease;
+}
+.btn-action-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--mira-accent);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--mira-paper);
+}
+.btn-action-card i {
+    font-size: 1.45rem;
+    flex-shrink: 0;
+}
+.btn-action-card strong {
+    display: block;
+    font-size: 0.92rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+.btn-action-card small {
+    display: block;
+    font-size: 0.74rem;
+    color: var(--mira-muted);
+}
+
+/* Painéis Secundários do Admin */
+.admin-panel {
+    padding: 1.5rem;
+}
+.admin-panel h2 {
+    color: var(--mira-paper);
+    font-size: 1.12rem;
+    font-weight: 720;
+}
+.admin-panel li {
+    margin-bottom: .65rem;
+    color: var(--mira-mist);
+}
+.admin-panel li strong {
+    color: var(--mira-paper);
+}
+
+/* Tabelas Administrativas */
+.admin-table {
+    color: var(--mira-paper);
+    margin-bottom: 0;
+    width: 100%;
+}
+.admin-table th {
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--mira-muted);
+    border-bottom: 1px solid var(--mira-line);
+    padding: 0.85rem 0.75rem;
+    background: transparent;
+}
+.admin-table td {
+    border-bottom: 1px solid var(--mira-line);
+    padding: 0.85rem 0.75rem;
+    vertical-align: middle;
+    background: transparent;
+    color: var(--mira-paper);
+}
+.admin-table tr:last-child td {
+    border-bottom: none;
+}
+.admin-table tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* Badges e Pílulas IA */
+.ai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.75rem;
+    background: rgba(230, 115, 21, 0.12);
+    border: 1px solid rgba(230, 115, 21, 0.3);
+    border-radius: 999px;
+    color: var(--primary-yellow);
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.rule-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--mira-line);
+    border-radius: 10px;
+    margin-bottom: 0.6rem;
+    font-size: 0.88rem;
+    color: var(--mira-paper);
+}
+.rule-pill i {
+    color: var(--primary-orange);
+}
+
+/* Indicador Pulsante Live */
+.pulse-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #22c55e;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+    animation: pulse-green 1.8s infinite;
+}
+@keyframes pulse-green {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 7px rgba(34, 197, 94, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+
+/* ------------------------------------------------------------------------------
+   2. BARRA DE CONTROLE: ORDENAÇÃO E FILTROS DE PREÇO NA VITRINE
+   ------------------------------------------------------------------------------ */
+.catalog-controls-card {
+    background: var(--mira-ink-raised);
+    border: 1px solid var(--mira-line);
+    border-radius: var(--mira-radius);
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .catalog-controls-card {
+    background: #ffffff;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+}
+
+.controls-main-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.25rem 2rem;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.control-label {
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 750;
+    color: var(--mira-muted);
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.catalog-select {
+    background: var(--mira-ink);
+    color: var(--mira-paper);
+    border: 1px solid var(--mira-line);
+    border-radius: 10px;
+    padding: 0.45rem 1rem 0.45rem 0.75rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.catalog-select:focus,
+.catalog-select:hover {
+    border-color: var(--mira-accent);
+}
+
+.price-inputs-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.catalog-input {
+    background: var(--mira-ink);
+    color: var(--mira-paper);
+    border: 1px solid var(--mira-line);
+    border-radius: 8px;
+    padding: 0.42rem 0.6rem;
+    font-size: 0.85rem;
+    width: 105px;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.catalog-input:focus {
+    border-color: var(--mira-accent);
+}
+
+.price-separator {
+    color: var(--mira-muted);
+    font-size: 0.82rem;
+}
+
+.btn-filter-apply {
+    background: var(--mira-accent);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.42rem 0.75rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+}
+
+.btn-filter-apply:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.promo-checkbox-label {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.42rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid var(--mira-line);
+    background: var(--mira-ink);
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.promo-checkbox-label:hover {
+    border-color: rgba(230, 115, 21, 0.6);
+}
+
+.promo-checkbox-label.is-checked {
+    background: rgba(220, 38, 38, 0.14);
+    border-color: #dc2626;
+    color: #f87171;
+}
+
+.promo-badge-text {
+    font-size: 0.84rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+/* ------------------------------------------------------------------------------
+   3. PRESETS RÁPIDOS DE FAIXA DE PREÇO
+   ------------------------------------------------------------------------------ */
+.price-presets-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--mira-line);
+}
+
+.presets-label {
+    font-size: 0.76rem;
+    color: var(--mira-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.presets-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.preset-chip {
+    display: inline-block;
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid var(--mira-line);
+    background: var(--mira-ink);
+    color: var(--mira-muted);
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.preset-chip:hover {
+    border-color: var(--mira-accent);
+    color: var(--mira-paper);
+}
+
+.preset-chip.is-active {
+    background: var(--mira-accent);
+    border-color: var(--mira-accent);
+    color: #ffffff;
+    font-weight: 750;
+}
+
+/* ------------------------------------------------------------------------------
+   4. FILTROS ATIVOS (CHIPS REMOVÍVEIS)
+   ------------------------------------------------------------------------------ */
+.active-filters-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px dashed var(--mira-line);
+}
+
+.active-filters-label {
+    font-size: 0.76rem;
+    color: var(--mira-muted);
+    font-weight: 700;
+}
+
+.active-filters-chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.active-filter-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.65rem;
+    background: rgba(230, 115, 21, 0.15);
+    border: 1px solid rgba(230, 115, 21, 0.4);
+    border-radius: 999px;
+    color: #f1e682;
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.18s;
+}
+
+[data-theme="light"] .active-filter-tag {
+    background: rgba(230, 115, 21, 0.1);
+    color: #b9470c;
+}
+
+.active-filter-tag:hover {
+    background: rgba(220, 38, 38, 0.2);
+    border-color: #dc2626;
+    color: #fca5a5;
+}
+
+.btn-clear-all-filters {
+    font-size: 0.76rem;
+    color: var(--mira-muted);
+    text-decoration: underline;
+    margin-left: 0.4rem;
+    transition: color 0.2s;
+}
+
+.btn-clear-all-filters:hover {
+    color: #ef4444;
+}

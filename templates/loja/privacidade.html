@@ -1,0 +1,37 @@
+{% extends 'loja/base.html' %}
+{% load static %}
+{% block title %}Privacidade e dados - MiraComerce IA{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <article class="card border-0 shadow-sm p-4 p-md-5">
+        <p class="text-uppercase small fw-bold text-muted">Transparência</p>
+        <h1 class="h2 fw-bold">Política de privacidade</h1>
+        <p class="text-muted">Última atualização: 1 de outubro de 2026</p>
+        <h2 class="h4 mt-4">Dados que tratamos</h2>
+        <p>Tratamos os dados fornecidos no cadastro e os dados necessários para processar pedidos, entregar compras, prevenir fraude e manter registros financeiros. Não vendemos dados pessoais.</p>
+        <h2 class="h4 mt-4">Retenção</h2>
+        <p>Dados de conta sem acesso por {{ data_retention_days|default:1825 }} dias entram no processo de anonimização. Registros de venda são mantidos de forma anonimizada quando necessários para auditoria, contabilidade e indicadores agregados.</p>
+        <h2 class="h4 mt-4">Seus direitos</h2>
+        <p>Você pode solicitar uma cópia dos dados associados à sua conta ou pedir a anonimização da conta. A anonimização remove nome, e-mail, telefone e endereço e encerra o acesso à conta.</p>
+        {% if user.is_authenticated %}
+        <div class="d-flex flex-wrap gap-2 mt-4">
+            <a class="btn btn-outline-dark" href="{% url 'exportar_dados' %}">Baixar meus dados</a>
+            {% if not user.is_staff %}
+            <form method="post" action="{% url 'excluir_dados' %}" data-confirm-delete>
+                {% csrf_token %}
+                <button class="btn btn-outline-danger" type="submit">Solicitar exclusão/anonimização</button>
+            </form>
+            {% endif %}
+        </div>
+        {% endif %}
+        <div class="d-flex flex-wrap gap-2 mt-4">
+            <a class="btn btn-dark" href="{% url 'definicoes' %}">Voltar às definições</a>
+            <a class="btn btn-outline-dark" href="{% url 'politica_devolucao' %}">Política de devolução</a>
+        </div>
+        <p class="small text-muted mt-4 mb-0">Para dúvidas ou solicitações específicas, contacte o responsável pelo tratamento através dos canais de suporte da loja.</p>
+    </article>
+</div>
+{% endblock %}
+
+{% block extra_js %}<script src="{% static 'loja/js/privacy.js' %}" defer></script>{% endblock %}

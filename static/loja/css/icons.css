@@ -1,0 +1,60 @@
+/* Ícones locais: elimina a dependência de uma folha externa e mantém o nome acessível no HTML. */
+.fas, .far, .fab { font-family: "Segoe UI Symbol", "Noto Sans Symbols", sans-serif; font-style: normal; line-height: 1; }
+.fas, .far, .fab { display: inline-block; min-width: 1em; text-align: center; }
+.fa-bars::before { content: "☰"; }
+.fa-dot-circle::before { content: "•"; }
+.fa-power-off::before { content: "⏻"; }
+.fa-shopping-cart::before, .fa-shopping-basket::before, .fa-cart-plus::before { content: "🛒"; }
+.fa-user-shield::before, .fa-user-circle::before, .fa-user-lock::before { content: "👤"; }
+.fa-star::before { content: "★"; }
+.fa-sun::before { content: "☀"; }
+.fa-moon::before { content: "☾"; }
+.fa-check-circle::before, .fa-check::before { content: "✓"; }
+.fa-envelope::before { content: "✉"; }
+.fa-phone-alt::before, .fa-phone::before { content: "☎"; }
+.fa-home::before { content: "⌂"; }
+.fa-map::before { content: "▧"; }
+.fa-city::before { content: "▥"; }
+.fa-lock::before, .fa-lock-open::before, .fa-key::before { content: "🔒"; }
+.fa-long-arrow-alt-left::before, .fa-arrow-left::before { content: "←"; }
+.fa-external-link-alt::before { content: "↗"; }
+.fa-truck::before, .fa-truck-fast::before { content: "🚚"; }
+.fa-minus::before { content: "−"; }
+.fa-plus::before { content: "+"; }
+.fa-trash-alt::before { content: "🗑"; }
+.fa-image::before { content: "▧"; }
+.fa-robot::before { content: "🤖"; }
+.fa-sparkles::before, .fa-magic::before { content: "✦"; }
+.fa-bullseye::before { content: "◎"; }
+.fa-coins::before { content: "◉"; }
+.fa-rocket::before { content: "🚀"; }
+.fa-list-ul::before { content: "☷"; }
+.fa-book-open::before { content: "▤"; }
+.fa-building::before { content: "▥"; }
+.fa-store::before { content: "⌂"; }
+.fa-search::before { content: "⌕"; }
+.fa-credit-card::before { content: "▣"; }
+.fa-chart-line::before { content: "↗"; }
+.fa-exclamation-triangle::before, .fa-exclamation-circle::before { content: "⚠"; }
+.fa-calendar-times::before { content: "▣"; }
+.fa-shopping-bag::before { content: "🛍"; }
+.fa-bolt::before { content: "ϟ"; }
+.fa-headset::before { content: "♧"; }
+.fa-shield-alt::before, .fa-shield-halved::before { content: "🛡"; }
+.fa-whatsapp::before { content: "☏"; }
+.fa-paper-plane::before { content: "➤"; }
+.fa-sign-in-alt::before { content: "↪"; }
+.fa-times-circle::before { content: "×"; }
+.fa-chevron-right::before { content: "›"; }
+.fa-th-large::before { content: "▦"; }
+.fa-brain::before { content: "◉"; }
+.fa-project-diagram::before { content: "⌘"; }
+.fa-circle-question::before { content: "?"; }
+.fa-sliders::before { content: "☷"; }
+.fa-user-pen::before { content: "✎"; }
+.fa-floppy-disk::before { content: "▣"; }
+.fa-box-open::before { content: "□"; }
+.fa-house::before { content: "⌂"; }
+.fa-right-to-bracket::before, .fa-right-from-bracket::before { content: "↪"; }
+.fa-user-xmark::before { content: "⊗"; }
+.fa-id-card::before { content: "▤"; }

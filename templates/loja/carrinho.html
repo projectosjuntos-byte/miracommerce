@@ -1,0 +1,831 @@
+{% extends "loja/base.html" %}
+{% load static %}
+{% block title %}Seu Carrinho - MiraComerce IA{% endblock %} 
+
+{% block extra_css %}
+<style nonce="{{ request.csp_nonce }}">
+  body {
+    background: linear-gradient(135deg, #e67315 0%, #f1e682 100%) !important;
+    background-attachment: fixed !important;
+    min-height: 100vh;
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.96) !important;
+    backdrop-filter: blur(10px);
+    border-radius: 28px !important;
+    border: 1px solid rgba(255,255,255,0.5) !important;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.08) !important;
+  }
+
+  .table {
+    border-collapse: separate;
+    border-spacing: 0 12px;
+  }
+
+  .table thead {
+    background: #1a1d1e !important;
+    color: white;
+  }
+
+  .table thead th {
+    border: none !important;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 16px 18px;
+  }
+
+  .table tbody tr {
+    background: rgba(255,255,255,0.72);
+    border-radius: 18px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+  }
+
+  .table tbody td {
+    border: none !important;
+    padding: 18px 16px;
+    vertical-align: middle;
+  }
+
+  .btn-qty {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    border: 1px solid rgba(26,29,30,0.08);
+    background: white;
+    color: #2d3436;
+    text-decoration: none;
+    border-radius: 10px;
+    box-shadow: 0 5px 12px rgba(0,0,0,0.05);
+  }
+
+  .btn-qty:hover {
+    background: #e67315;
+    color: white;
+    transform: translateY(-1px);
+  }
+
+  .resumo-card {
+    background: linear-gradient(180deg, #1a1d1e 0%, #25282a 100%) !important;
+    border-radius: 28px !important;
+    color: white;
+    border: 1px solid rgba(255,255,255,0.06) !important;
+    box-shadow: 0 18px 36px rgba(26,29,30,0.18) !important;
+  }
+
+  .total-valor {
+    color: #f1e682;
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+  }
+
+  .btn-checkout {
+    background: linear-gradient(90deg, #e67315, #ff9f43);
+    border: none;
+    padding: 15px;
+    font-weight: 700;
+    color: white;
+    box-shadow: 0 12px 24px rgba(230,115,21,0.24);
+  }
+
+  /* ESTILOS DA IA */
+  .ia-suggestion-card {
+    background: rgba(255,255,255,0.98);
+    border: 1px solid rgba(230, 115, 21, 0.12);
+    transition: all 0.35s ease;
+    position: relative;
+    overflow: hidden;
+    border-radius: 22px !important;
+    padding: 18px 16px 16px !important;
+  }
+
+  .ia-suggestion-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 16px 28px rgba(0,0,0,0.10);
+    border-color: rgba(230, 115, 21, 0.24);
+  }
+
+  .badge-ia-animado {
+    background: linear-gradient(45deg, #e67315, #f1e682);
+    color: #1a1d1e;
+    font-size: 0.66rem;
+    font-weight: 900;
+    padding: 6px 12px;
+    border-radius: 50px;
+    letter-spacing: 0.06em;
+    animation: pulse-ia 2s infinite ease-in-out;
+  }
+
+  .ia-product-image {
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, #fffaf2, #f5f5f5);
+    border-radius: 16px;
+    overflow: hidden;
+    margin: 8px 0 14px;
+  }
+
+  .ia-product-image img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+  }
+
+  .ia-product-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1a1d1e;
+    min-height: 46px;
+    line-height: 1.35;
+    margin-bottom: 8px;
+  }
+
+  .ia-match-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(230, 115, 21, 0.08);
+    color: #8a4d10;
+    border: 1px solid rgba(230, 115, 21, 0.14);
+    border-radius: 999px;
+    padding: 5px 10px;
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+
+  .btn-add-suggestion {
+    width: 42px;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #1a1d1e 0%, #2c2f31 100%);
+    color: white;
+    border: none;
+    transition: all 0.25s ease;
+    box-shadow: 0 8px 16px rgba(26,29,30,0.12);
+  }
+
+  .btn-add-suggestion:hover {
+    background: linear-gradient(135deg, #e67315 0%, #ff8d2e 100%);
+    transform: translateY(-1px);
+  }
+
+  @keyframes pulse-ia {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  .vip-bonus-card {
+    background: linear-gradient(135deg, #201f1f 0%, #2b2d2f 100%) !important;
+    border-radius: 20px !important;
+    border: 1px solid rgba(241, 230, 130, 0.5) !important;
+    color: white;
+    box-shadow: 0 12px 20px rgba(26,29,30,0.10);
+  }
+
+  /* Refinamento visual do fluxo do carrinho */
+  body {
+    background: radial-gradient(circle at 8% 0%, rgba(230,115,21,0.12), transparent 32%), #f4f6f7 !important;
+  }
+
+  .cart-page {
+    max-width: 1180px;
+  }
+
+  .cart-hero {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 4px 18px;
+    border-bottom: 1px solid rgba(26,29,30,0.12);
+  }
+
+  .cart-hero-icon {
+    width: 54px;
+    height: 54px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 54px;
+    border-radius: 16px;
+    background: #1a1d1e;
+    color: #f1e682;
+    box-shadow: 0 10px 24px rgba(26,29,30,0.14);
+  }
+
+  .cart-eyebrow,
+  .cart-section-kicker,
+  .summary-kicker {
+    color: #a8530d;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+  }
+
+  .cart-title {
+    color: #1a1d1e;
+    font-size: clamp(1.8rem, 3vw, 2.45rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+  }
+
+  .cart-subtitle,
+  .cart-section-help,
+  .recommendations-help {
+    color: #687177;
+    font-size: 0.92rem;
+  }
+
+  .glass-card,
+  .resumo-card {
+    border-radius: 22px !important;
+  }
+
+  .glass-card {
+    border-color: rgba(26,29,30,0.08) !important;
+    box-shadow: 0 16px 36px rgba(26,29,30,0.08) !important;
+    overflow: hidden;
+  }
+
+  .cart-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 26px 26px 18px;
+  }
+
+  .cart-section-title,
+  .recommendations-title {
+    color: #1a1d1e;
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .cart-section-title i,
+  .recommendations-title i {
+    color: #e67315;
+  }
+
+  .cart-count-badge {
+    flex: 0 0 auto;
+    border-radius: 999px;
+    padding: 8px 12px;
+    background: #fff4e8;
+    color: #a8530d;
+    font-size: 0.75rem;
+    font-weight: 800;
+  }
+
+  .cart-table-wrap {
+    padding: 0 18px 18px;
+  }
+
+  .cart-table {
+    border-spacing: 0 8px;
+  }
+
+  .cart-table thead th {
+    background: #1a1d1e !important;
+    color: rgba(255,255,255,0.78);
+    padding: 13px 14px;
+    font-size: 0.66rem;
+  }
+
+  .cart-table thead th:first-child {
+    border-radius: 12px 0 0 12px;
+  }
+
+  .cart-table thead th:last-child {
+    border-radius: 0 12px 12px 0;
+  }
+
+  .cart-table tbody tr {
+    background: #fff;
+    box-shadow: 0 5px 16px rgba(26,29,30,0.055);
+  }
+
+  .cart-table tbody tr.is-updating {
+    opacity: 0.58;
+    transition: opacity 0.18s ease;
+  }
+
+  .cart-table tbody tr.is-updating .btn-qty {
+    cursor: wait;
+  }
+
+  .cart-table tbody td {
+    padding: 15px 12px;
+    border-top: 1px solid rgba(26,29,30,0.045) !important;
+    border-bottom: 1px solid rgba(26,29,30,0.045) !important;
+  }
+
+  .cart-table tbody td:first-child {
+    border-left: 1px solid rgba(26,29,30,0.045);
+    border-radius: 16px 0 0 16px;
+  }
+
+  .cart-table tbody td:last-child {
+    border-right: 1px solid rgba(26,29,30,0.045);
+    border-radius: 0 16px 16px 0;
+  }
+
+  .cart-table tbody td:first-child img {
+    background: #f8f9fa;
+    border: 1px solid rgba(26,29,30,0.06);
+  }
+
+  .btn-qty {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px !important;
+    box-shadow: none;
+  }
+
+  .btn-qty:focus-visible,
+  .btn-add-suggestion:focus-visible,
+  .btn-checkout:focus-visible {
+    outline: 3px solid rgba(230,115,21,0.38);
+    outline-offset: 3px;
+  }
+
+  .resumo-card {
+    position: relative;
+    z-index: 2;
+    background: linear-gradient(160deg, #171a1b 0%, #292d2f 100%) !important;
+    padding: 26px !important;
+  }
+
+  .cart-summary-column {
+    position: relative;
+    z-index: 2;
+    isolation: isolate;
+  }
+
+  .vip-bonus-card {
+    position: relative;
+    z-index: 1;
+    margin-top: 28px !important;
+  }
+
+  .summary-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .summary-icon {
+    color: #f1e682;
+    font-size: 1.35rem;
+  }
+
+  .summary-note {
+    margin: 18px 0 24px;
+    padding: 10px 12px;
+    border: 1px solid rgba(241,230,130,0.16);
+    border-radius: 10px;
+    color: rgba(255,255,255,0.7);
+    font-size: 0.75rem;
+  }
+
+  .summary-total-block {
+    padding: 18px 0 4px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+  }
+
+  .total-valor {
+    font-size: clamp(2rem, 4vw, 2.55rem);
+  }
+
+  .btn-checkout {
+    min-height: 54px;
+    letter-spacing: 0.01em;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .btn-checkout:hover {
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 16px 28px rgba(230,115,21,0.32);
+  }
+
+  .empty-cart-card {
+    padding: 72px 28px !important;
+  }
+
+  .empty-cart-icon {
+    width: 78px;
+    height: 78px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 24px;
+    background: #fff4e8;
+    color: #e67315;
+  }
+
+  .cart-recommendations {
+    border-top: 1px solid rgba(26,29,30,0.12);
+  }
+
+  .recommendations-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+  }
+
+  .recommendations-mark {
+    width: 48px;
+    height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: #1a1d1e;
+    color: #f1e682;
+    font-size: 1.1rem;
+  }
+
+  .ia-suggestion-card {
+    border-color: rgba(26,29,30,0.08) !important;
+    box-shadow: 0 12px 26px rgba(26,29,30,0.07) !important;
+  }
+
+  .ia-suggestion-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 30px rgba(26,29,30,0.12) !important;
+  }
+
+  @media (max-width: 991.98px) {
+    .cart-summary-column {
+      z-index: auto;
+    }
+  }
+
+  @media (max-width: 767.98px) {
+    .cart-page {
+      padding-top: 28px !important;
+      padding-bottom: 32px !important;
+    }
+
+    .cart-hero {
+      align-items: flex-start;
+      padding-bottom: 16px;
+    }
+
+    .cart-hero-icon {
+      width: 46px;
+      height: 46px;
+      flex-basis: 46px;
+    }
+
+    .cart-subtitle {
+      font-size: 0.84rem;
+    }
+
+    .cart-card-header {
+      padding: 22px 20px 16px;
+    }
+
+    .cart-count-badge {
+      font-size: 0.68rem;
+      padding: 7px 9px;
+    }
+
+    .cart-table-wrap {
+      padding: 0 14px 14px;
+      overflow: visible;
+    }
+
+    .cart-table,
+    .cart-table thead,
+    .cart-table tbody,
+    .cart-table tr,
+    .cart-table td {
+      display: block;
+      width: 100%;
+    }
+
+    .cart-table thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+    }
+
+    .cart-table tbody tr {
+      margin-bottom: 12px;
+      padding: 15px;
+      border-radius: 16px;
+    }
+
+    .cart-table tbody td,
+    .cart-table tbody td:first-child,
+    .cart-table tbody td:last-child {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 11px 0 !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      text-align: right !important;
+    }
+
+    .cart-table tbody td:first-child {
+      display: block;
+      padding-top: 0 !important;
+      padding-bottom: 14px !important;
+      border-bottom: 1px solid rgba(26,29,30,0.08) !important;
+      text-align: left !important;
+    }
+
+    .cart-table tbody td[data-label]::before {
+      content: attr(data-label);
+      color: #687177;
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-align: left;
+    }
+
+    .cart-table tbody td[data-label] > * {
+      margin-left: auto;
+    }
+
+    .cart-table tbody td[data-label="Ação"] form {
+      margin-left: auto;
+    }
+
+    .cart-table tbody td:first-child .fs-5 {
+      font-size: 0.98rem !important;
+    }
+
+    .empty-cart-card {
+      padding: 54px 22px !important;
+    }
+
+    .resumo-card {
+      padding: 22px !important;
+    }
+
+    .recommendations-heading {
+      align-items: flex-start;
+    }
+
+    .recommendations-mark {
+      flex: 0 0 42px;
+      width: 42px;
+      height: 42px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cart-page .animate__animated,
+    .badge-ia-animado,
+    .btn-checkout,
+    .ia-suggestion-card,
+    .btn-qty {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+</style>
+{% endblock %} 
+
+{% block content %}
+<div class="container py-5 cart-page">
+  <div class="cart-hero mb-4 animate__animated animate__fadeInLeft">
+    <div class="cart-hero-icon" aria-hidden="true">
+      <i class="fas fa-shopping-basket fa-lg"></i>
+    </div>
+    <div>
+      <div class="cart-eyebrow">REVISÃO DO PEDIDO</div>
+      <h1 class="cart-title mb-1">Seu carrinho</h1>
+      <p class="cart-subtitle mb-0">Confira os produtos, ajuste as quantidades e avance quando estiver tudo certo.</p>
+    </div>
+  </div>
+
+  <div class="row g-4 flex-column-reverse flex-lg-row align-items-start">
+    <div class="col-lg-8">
+      {% if itens %}
+      <div id="cart-items-card" data-cart-items-card class="card glass-card animate__animated animate__fadeInUp">
+        <div class="card-header cart-card-header bg-transparent border-0">
+          <div>
+            <div class="cart-section-kicker">SELEÇÃO ATUAL</div>
+            <h2 class="cart-section-title mb-1"><i class="fas fa-list-ul me-2" aria-hidden="true"></i>Meus itens</h2>
+            <p class="cart-section-help mb-0">Produtos reservados para esta compra.</p>
+          </div>
+          <span class="cart-count-badge" data-cart-line-count>{{ itens|length }} produto{{ itens|length|pluralize:"s" }}</span>
+        </div>
+        <div class="table-responsive cart-table-wrap">
+          <table class="table align-middle mb-0 cart-table">
+            <thead>
+              <tr>
+                <th class="ps-4">Produto</th>
+                <th class="text-center">Qtd</th>
+                <th class="text-end">Preço Un.</th>
+                <th class="text-end">Subtotal</th>
+                <th class="text-center">Ação</th>
+              </tr>
+            </thead>
+            <tbody>
+     {% for item in itens %}
+    <tr data-cart-item="{{ item.produto.id }}">
+        <td class="ps-4 py-4">
+            <div class="d-flex align-items-center">
+                <img src="{% if item.produto.thumbnail %}{{ item.produto.thumbnail.url }}{% elif item.produto.imagem %}{{ item.produto.imagem.url }}{% else %}{% static 'loja/img/produto-placeholder.svg' %}{% endif %}" width="70" height="70" loading="lazy" class="rounded-4 shadow-sm me-3" alt="{{ item.produto.nome }}" style="object-fit: cover;">
+                <div>
+                    <div class="fw-bold fs-5 text-dark">{{ item.produto.nome }}</div>
+                    <span class="badge bg-light text-muted fw-normal">{{ item.produto.categoria }}</span>
+                </div>
+            </div>
+        </td>
+        
+        <td class="text-center" data-label="Quantidade">
+            <div class="d-flex align-items-center justify-content-center">
+                <form action="{% url 'editar_carrinho' item.produto.id 'diminuir' %}" method="post" class="d-inline cart-quantity-form">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-qty rounded-circle shadow-sm border-0" aria-label="Diminuir quantidade de {{ item.produto.nome }}">
+                        <i class="fas fa-minus" aria-hidden="true"></i>
+                    </button>
+                </form>
+                <span class="mx-3 fw-bold fs-5 cart-item-quantity" data-cart-quantity>{{ item.quantidade }}</span>
+                <form action="{% url 'editar_carrinho' item.produto.id 'aumentar' %}" method="post" class="d-inline cart-quantity-form">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-qty rounded-circle shadow-sm border-0" aria-label="Aumentar quantidade de {{ item.produto.nome }}">
+                        <i class="fas fa-plus" aria-hidden="true"></i>
+                    </button>
+                </form>
+            </div>
+        </td>
+
+        <td class="text-end" data-label="Preço unitário">
+            {% if item.produto.em_promocao %}
+                <div class="d-flex flex-column align-items-end">
+                    <small class="text-danger text-decoration-line-through">{{ item.produto.preco|floatformat:2 }} Kz</small>
+                    <span class="badge bg-success mb-1" style="font-size: 0.6rem;">DESCONTO IA</span>
+                    <strong class="text-dark fs-5">{{ item.preco_unitario|floatformat:2 }} Kz</strong>
+                </div>
+            {% else %}
+                <span class="text-muted fs-5">{{ item.produto.preco|floatformat:2 }} Kz</span>
+            {% endif %}
+        </td>
+
+        <td class="text-end fw-bold fs-5" data-label="Subtotal" style="color: #e67315;">
+            <span class="cart-item-subtotal" data-cart-item-subtotal>{{ item.subtotal|floatformat:2 }} Kz</span>
+        </td>
+
+        <td class="text-center" data-label="Ação">
+            <form action="{% url 'remover_do_carrinho' item.produto.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-link text-danger p-0" aria-label="Remover {{ item.produto.nome }} do carrinho">
+                    <i class="fas fa-trash-alt fs-5" aria-hidden="true"></i>
+                </button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% endif %}
+          <div id="cart-empty-state" data-cart-empty-state class="card glass-card empty-cart-card text-center shadow-lg{% if itens %} d-none{% endif %}">
+              <div class="empty-cart-icon mb-4 mx-auto" role="img" aria-label="Carrinho vazio"><i class="fas fa-shopping-basket fa-2x" aria-hidden="true"></i></div>
+              <div class="cart-section-kicker">NENHUM PRODUTO AINDA</div>
+              <h2 class="fw-bold text-dark mb-2">Seu carrinho está vazio</h2>
+              <p class="text-muted mb-4">Aproveite nossas ofertas e encontre os produtos para a sua próxima compra.</p>
+              <a href="{% url 'home' %}" class="btn btn-dark rounded-pill px-5 py-3 fw-bold"><i class="fas fa-arrow-left me-2" aria-hidden="true"></i>Ver produtos</a>
+          </div>
+        </div>
+
+
+    <div class="col-lg-4 cart-summary-column">
+      <div class="card resumo-card cart-payment-card border-0 shadow-lg p-4 animate__animated animate__fadeInRight mb-4">
+        <div class="summary-heading">
+          <div>
+            <div class="summary-kicker">PAGAMENTO</div>
+            <h2 class="fw-bold mb-0">Resumo do pedido</h2>
+          </div>
+          <i class="fas fa-receipt summary-icon" aria-hidden="true"></i>
+        </div>
+        <div class="summary-note"><i class="fas fa-shield-alt me-2" aria-hidden="true"></i>Valores atualizados para esta sessão.</div>
+        <div class="d-flex justify-content-between mb-3 opacity-75">
+          <span>Produtos</span>
+          <span class="fw-bold" data-cart-products-count>{{ itens|length }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-3 opacity-75">
+          <span>Subtotal:</span>
+          <span class="fw-bold" data-cart-subtotal>{{ subtotal|floatformat:2 }} Kz</span>
+        </div>
+        <div class="d-flex justify-content-between mb-3 opacity-75">
+          <span>Entrega:</span>
+          {% if frete %}
+            <span class="fw-bold" data-cart-shipping>{{ frete|floatformat:2 }} Kz</span>
+          {% else %}
+            <span class="text-success fw-bold" data-cart-shipping>Grátis</span>
+          {% endif %}
+        </div>
+        <hr class="border-secondary my-4" />
+        <div class="text-center mb-4 summary-total-block">
+          <div class="small opacity-50 mb-1">TOTAL A PAGAR</div>
+          <div class="total-valor" data-cart-total>{{ total|floatformat:2 }} Kz</div>
+        </div>
+        {% if itens %}
+        <form id="checkout-form" action="{% url 'finalizar_compra' %}" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="idempotency_key" value="{{ checkout_idempotency_key }}">
+          <button type="submit" class="btn btn-checkout btn-lg w-100 rounded-pill text-white mb-3" id="finalizar-btn">
+            Finalizar compra <i class="fas fa-rocket ms-2" aria-hidden="true"></i>
+          </button>
+        </form>
+        {% endif %}
+        <a href="{% url 'home' %}" class="btn btn-outline-light w-100 rounded-pill py-2 opacity-50">
+          <i class="fas fa-arrow-left me-2" aria-hidden="true"></i>Escolher mais produtos
+        </a>
+      </div>
+
+      <div class="card vip-bonus-card p-3 shadow-lg">
+        <div class="d-flex align-items-center">
+          <div class="me-3"><i class="fas fa-coins fa-2x text-warning" aria-hidden="true"></i></div>
+          <div>
+            <small class="d-block opacity-75">Seu Saldo de Bônus</small>
+            <span class="fw-bold fs-4">{{ saldo_bonus|default:0|floatformat:2 }} Kz</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="cart-update-feedback" class="visually-hidden" aria-live="polite"></div>
+
+  {% if sugestoes_ia %}
+  <div class="cart-recommendations mt-5 pt-4 animate__animated animate__fadeInUp">
+    <div class="recommendations-heading mb-4">
+      <div>
+        <div class="cart-eyebrow">SUGESTÕES PERSONALIZADAS</div>
+        <h2 class="recommendations-title mb-1"><i class="fas fa-sparkles me-2" aria-hidden="true"></i>Complete a sua compra</h2>
+        <p class="recommendations-help mb-0">A IA encontrou opções que combinam com os produtos do seu carrinho.</p>
+      </div>
+      <span class="recommendations-mark" aria-hidden="true"><i class="fas fa-robot"></i></span>
+    </div>
+    <div class="row g-3">
+      {% for item in sugestoes_ia %}
+      <div class="col-md-4">
+        <div class="card ia-suggestion-card h-100 shadow-sm border-0">
+          <div class="ia-badge-wrapper" style="position: absolute; top: 12px; right: 12px; z-index: 2;">
+            <div class="badge-ia-animado"><i class="fas fa-robot" aria-hidden="true"></i> IA</div>
+          </div>
+
+          <div class="ia-product-image">
+            {% if item.produto_sugerido.imagem %}
+              <img src="{% if item.produto_sugerido.thumbnail %}{{ item.produto_sugerido.thumbnail.url }}{% elif item.produto_sugerido.imagem %}{{ item.produto_sugerido.imagem.url }}{% else %}{% static 'loja/img/produto-placeholder.svg' %}{% endif %}" alt="{{ item.produto_sugerido.nome }}" width="400" height="400" loading="lazy" />
+            {% else %}
+              <img src="{% static 'loja/img/produto-placeholder.svg' %}" alt="Imagem indisponível" width="400" height="400" loading="lazy" />
+            {% endif %}
+          </div>
+
+          <div class="ia-product-name">{{ item.produto_sugerido.nome }}</div>
+          <div class="mb-3">
+            <span class="ia-match-badge">
+              <i class="fas fa-bullseye" aria-hidden="true"></i>{{ item.confianca }}% Match
+            </span>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mt-auto">
+            <div>
+              <div class="small text-muted text-decoration-line-through">{{ item.produto_sugerido.preco|floatformat:2 }} Kz</div>
+              <span class="fw-bold fs-5 text-dark">{{ item.produto_sugerido.preco|floatformat:2 }} Kz</span>
+            </div>
+            <form action="{% url 'adicionar_ao_carrinho' item.produto_sugerido.id %}" method="post">
+              {% csrf_token %}
+              <button type="submit" class="btn-add-suggestion" aria-label="Adicionar {{ item.produto_sugerido.nome }} ao carrinho">
+                <i class="fas fa-cart-plus" aria-hidden="true"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}
+
+{% block extra_js %}<script src="{% static 'loja/js/cart.js' %}" defer></script>{% endblock %}

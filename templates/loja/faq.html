@@ -1,0 +1,288 @@
+{% extends "loja/base.html" %}
+
+{% block title %}Perguntas frequentes - MiraComerce{% endblock %}
+
+{% block extra_css %}
+<style nonce="{{ request.csp_nonce }}">
+    .faq-page {
+        max-width: 1080px;
+    }
+
+    .faq-intro {
+        border-radius: 24px;
+        background: linear-gradient(135deg, #1a1d1e 0%, #282d2d 100%);
+        color: #fff;
+        box-shadow: 0 16px 32px rgba(26, 29, 30, .16);
+    }
+
+    .faq-intro-mark {
+        width: 56px;
+        height: 56px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 16px;
+        background: rgba(241, 230, 130, .16);
+        color: #f1e682;
+        font-size: 1.35rem;
+    }
+
+    .faq-section-title {
+        color: #1a1d1e;
+        font-weight: 800;
+    }
+
+    .faq-item {
+        border: 1px solid rgba(26, 29, 30, .09);
+        border-radius: 16px !important;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 8px 20px rgba(26, 29, 30, .05);
+    }
+
+    .faq-item + .faq-item {
+        margin-top: .85rem;
+    }
+
+    .faq-question {
+        color: #1a1d1e;
+        font-weight: 700;
+        padding: 1.15rem 1.25rem;
+    }
+
+    .faq-question:not(.collapsed) {
+        color: #c35f0f;
+        background: rgba(241, 230, 130, .14);
+    }
+
+    .faq-question:focus-visible,
+    .faq-link:focus-visible {
+        outline: 3px solid rgba(230, 115, 21, .4);
+        outline-offset: 2px;
+    }
+
+    .faq-answer {
+        color: #51565a;
+        line-height: 1.75;
+    }
+
+    .faq-link {
+        color: #b8560c;
+        font-weight: 700;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 3px;
+    }
+
+    /* Sistema visual da vitrine aplicado à área de suporte. */
+    .faq-page {
+        max-width: 960px;
+        padding-top: 4.5rem !important;
+        padding-bottom: 5rem !important;
+    }
+
+    .faq-intro {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--mira-line);
+        border-radius: var(--mira-radius);
+        background: var(--mira-ink-raised);
+        box-shadow: var(--mira-shadow);
+    }
+
+    .faq-intro::after {
+        position: absolute;
+        top: -5rem;
+        right: -4rem;
+        width: 14rem;
+        height: 14rem;
+        border: 1px solid rgba(244, 122, 31, 0.24);
+        border-radius: 50%;
+        content: "";
+        pointer-events: none;
+    }
+
+    .faq-intro-mark {
+        flex: 0 0 56px;
+        border-radius: 14px;
+        background: var(--mira-accent);
+        color: #1a1711;
+    }
+
+    .faq-intro .text-warning {
+        color: var(--mira-accent) !important;
+        letter-spacing: .08em;
+    }
+
+    .faq-intro h1,
+    .faq-section-title {
+        color: var(--mira-paper);
+        letter-spacing: -0.04em;
+    }
+
+    .faq-intro .text-white-50,
+    .faq-answer {
+        color: var(--mira-muted) !important;
+    }
+
+    .faq-item {
+        border-color: var(--mira-line);
+        border-radius: 14px !important;
+        background: var(--mira-ink-raised);
+        box-shadow: none;
+    }
+
+    .faq-question,
+    .faq-question.collapsed {
+        background: var(--mira-ink-raised) !important;
+        color: var(--mira-paper) !important;
+        font-size: 1rem;
+    }
+
+    .faq-question:not(.collapsed) {
+        background: rgba(244, 122, 31, 0.12) !important;
+        color: var(--mira-accent) !important;
+        box-shadow: inset 3px 0 0 var(--mira-accent);
+    }
+
+    .faq-question::after {
+        filter: invert(77%) sepia(42%) saturate(1123%) hue-rotate(343deg) brightness(101%) contrast(91%);
+    }
+
+    .faq-answer {
+        border-top: 1px solid var(--mira-line);
+    }
+
+    .faq-link {
+        color: var(--mira-accent);
+    }
+
+    .faq-page .btn-outline-dark {
+        border-color: rgba(237, 241, 231, 0.42);
+        color: var(--mira-paper);
+    }
+
+    .faq-page .btn-outline-dark:hover,
+    .faq-page .btn-outline-dark:focus-visible {
+        border-color: var(--mira-accent);
+        background: var(--mira-accent);
+        color: #1a1711;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .faq-item .collapse {
+            transition: none;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container faq-page py-5">
+    <header class="faq-intro p-4 p-md-5 mb-5">
+        <div class="d-flex align-items-start gap-3">
+            <div class="faq-intro-mark" aria-hidden="true"><i class="fas fa-circle-question"></i></div>
+            <div>
+                <p class="text-warning text-uppercase small fw-bold mb-2">Ajuda rápida</p>
+                <h1 class="h2 fw-bold mb-2">Perguntas frequentes</h1>
+                <p class="text-white-50 mb-0">Encontre respostas sobre compras, pagamentos, entregas, devoluções e proteção de dados.</p>
+            </div>
+        </div>
+    </header>
+
+    <section aria-labelledby="faqCompraTitulo" class="mb-5">
+        <h2 id="faqCompraTitulo" class="h4 faq-section-title mb-3">Compras e conta</h2>
+        <div class="accordion" id="faqCompras">
+            <div class="accordion-item faq-item">
+                <h3 class="accordion-header" id="faqContaTitulo">
+                    <button class="accordion-button collapsed faq-question" type="button" data-bs-toggle="collapse" data-bs-target="#faqConta" aria-expanded="false" aria-controls="faqConta">
+                        Como crio uma conta?
+                    </button>
+                </h3>
+                <div id="faqConta" class="accordion-collapse collapse" aria-labelledby="faqContaTitulo" data-bs-parent="#faqCompras">
+                    <div class="accordion-body faq-answer">Acesse <a class="faq-link" href="{% url 'cadastro' %}">Criar Conta</a>, preencha os dados solicitados e confirme o cadastro. Depois poderá entrar e finalizar as suas compras.</div>
+                </div>
+            </div>
+
+            <div class="accordion-item faq-item">
+                <h3 class="accordion-header" id="faqCompraTituloUm">
+                    <button class="accordion-button collapsed faq-question" type="button" data-bs-toggle="collapse" data-bs-target="#faqCompraUm" aria-expanded="false" aria-controls="faqCompraUm">
+                        Como faço uma compra?
+                    </button>
+                </h3>
+                <div id="faqCompraUm" class="accordion-collapse collapse" aria-labelledby="faqCompraTituloUm" data-bs-parent="#faqCompras">
+                    <div class="accordion-body faq-answer">Escolha uma categoria, adicione os produtos ao carrinho, confira quantidades e valores e selecione finalizar compra. O sistema solicitará autenticação antes da confirmação.</div>
+                </div>
+            </div>
+
+            <div class="accordion-item faq-item">
+                <h3 class="accordion-header" id="faqSenhaTitulo">
+                    <button class="accordion-button collapsed faq-question" type="button" data-bs-toggle="collapse" data-bs-target="#faqSenha" aria-expanded="false" aria-controls="faqSenha">
+                        Esqueci a minha senha. O que faço?
+                    </button>
+                </h3>
+                <div id="faqSenha" class="accordion-collapse collapse" aria-labelledby="faqSenhaTitulo" data-bs-parent="#faqCompras">
+                    <div class="accordion-body faq-answer">Na página de entrada, selecione a opção de recuperação de senha e informe o e-mail da conta. O link enviado permite criar uma nova senha.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section aria-labelledby="faqPedidoTitulo" class="mb-5">
+        <h2 id="faqPedidoTitulo" class="h4 faq-section-title mb-3">Pedido, pagamento e entrega</h2>
+        <div class="accordion" id="faqPedidos">
+            <div class="accordion-item faq-item">
+                <h3 class="accordion-header" id="faqPagamentoTitulo">
+                    <button class="accordion-button collapsed faq-question" type="button" data-bs-toggle="collapse" data-bs-target="#faqPagamento" aria-expanded="false" aria-controls="faqPagamento">
+                        O que acontece se o pagamento falhar?
+                    </button>
+                </h3>
+                <div id="faqPagamento" class="accordion-collapse collapse" aria-labelledby="faqPagamentoTitulo" data-bs-parent="#faqPedidos">
+                    <div class="accordion-body faq-answer">Quando o gateway não confirma o pagamento, o pedido não é concluído. Verifique os dados, tente novamente ou utilize outro método disponível. Em caso de cobrança sem confirmação, guarde o comprovativo e solicite apoio.</div>
+                </div>
+            </div>
+
+            <div class="accordion-item faq-item">
+                <h3 class="accordion-header" id="faqEntregaTitulo">
+                    <button class="accordion-button collapsed faq-question" type="button" data-bs-toggle="collapse" data-bs-target="#faqEntrega" aria-expanded="false" aria-controls="faqEntrega">
+                        Como funciona a entrega?
+                    </button>
+                </h3>
+                <div id="faqEntrega" class="accordion-collapse collapse" aria-labelledby="faqEntregaTitulo" data-bs-parent="#faqPedidos">
+                    <div class="accordion-body faq-answer">O valor do frete é calculado no checkout conforme as regras da loja. Antes de confirmar, revise a morada e o resumo do pedido para evitar atrasos.</div>
+                </div>
+            </div>
+
+            <div class="accordion-item faq-item">
+                <h3 class="accordion-header" id="faqDevolucaoTitulo">
+                    <button class="accordion-button collapsed faq-question" type="button" data-bs-toggle="collapse" data-bs-target="#faqDevolucao" aria-expanded="false" aria-controls="faqDevolucao">
+                        Como solicito uma devolução?
+                    </button>
+                </h3>
+                <div id="faqDevolucao" class="accordion-collapse collapse" aria-labelledby="faqDevolucaoTitulo" data-bs-parent="#faqPedidos">
+                    <div class="accordion-body faq-answer">Consulte a <a class="faq-link" href="{% url 'politica_devolucao' %}">Política de devolução</a> para verificar as condições, os dados necessários e o fluxo de análise.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section aria-labelledby="faqDadosTitulo" class="mb-4">
+        <h2 id="faqDadosTitulo" class="h4 faq-section-title mb-3">Dados e privacidade</h2>
+        <div class="accordion" id="faqDados">
+            <div class="accordion-item faq-item">
+                <h3 class="accordion-header" id="faqDadosPerguntaTitulo">
+                    <button class="accordion-button collapsed faq-question" type="button" data-bs-toggle="collapse" data-bs-target="#faqDadosPergunta" aria-expanded="false" aria-controls="faqDadosPergunta">
+                        Como posso consultar ou excluir os meus dados?
+                    </button>
+                </h3>
+                <div id="faqDadosPergunta" class="accordion-collapse collapse" aria-labelledby="faqDadosPerguntaTitulo" data-bs-parent="#faqDados">
+                    <div class="accordion-body faq-answer">Acesse as <a class="faq-link" href="{% url 'definicoes' %}">Definições</a> e abra a Política de privacidade. Usuários autenticados podem solicitar uma cópia dos dados ou a anonimização da conta.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="text-center mt-5">
+        <a class="btn btn-outline-dark rounded-pill px-4" href="{% url 'home' %}"><i class="fas fa-house me-2" aria-hidden="true"></i>Voltar à loja</a>
+    </div>
+</div>
+{% endblock %}

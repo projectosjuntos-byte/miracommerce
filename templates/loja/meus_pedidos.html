@@ -1,0 +1,470 @@
+{% extends "loja/base.html" %}
+{% load static %}
+
+{% block title %}{% if modo_ver_todos %}Gestão de Pedidos da Loja - Admin{% else %}Meus Pedidos - MiraComerce IA{% endif %}{% endblock %}
+
+{% block extra_css %}
+<style nonce="{{ request.csp_nonce }}">
+    .orders-container {
+        max-width: 1080px;
+        margin: 2rem auto 4rem;
+        padding: 0 1rem;
+    }
+
+    .orders-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.25rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    [data-theme="light"] .orders-header {
+        border-bottom-color: rgba(0, 0, 0, 0.08);
+    }
+
+    .orders-title {
+        font-size: 1.75rem;
+        font-weight: 800;
+        margin: 0;
+        letter-spacing: -0.02em;
+    }
+
+    .orders-subtitle {
+        color: rgba(255, 255, 255, 0.65);
+        font-size: 0.95rem;
+        margin: 0.25rem 0 0;
+    }
+
+    [data-theme="light"] .orders-subtitle {
+        color: #6c757d;
+    }
+
+    /* BARRA DE NAVEGAÇÃO DE STAFF */
+    .admin-orders-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding: 1rem 1.25rem;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        margin-bottom: 2rem;
+    }
+
+    [data-theme="light"] .admin-orders-toolbar {
+        background: #f8f9fa;
+        border-color: rgba(0, 0, 0, 0.08);
+    }
+
+    .order-card {
+        background: #1e2225;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 18px;
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    [data-theme="light"] .order-card {
+        background: #ffffff;
+        border-color: rgba(0, 0, 0, 0.08);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+    }
+
+    .order-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(230, 115, 21, 0.4);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+    }
+
+    [data-theme="light"] .order-card:hover {
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+    }
+
+    .order-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding: 1.25rem 1.5rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    [data-theme="light"] .order-card-header {
+        background: rgba(0, 0, 0, 0.02);
+        border-bottom-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .order-code-group {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .order-icon-badge {
+        width: 44px;
+        height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: rgba(230, 115, 21, 0.15);
+        color: #e67315;
+        font-size: 1.2rem;
+    }
+
+    .order-code {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #f1e682;
+        margin: 0;
+    }
+
+    [data-theme="light"] .order-code {
+        color: #c95d08;
+    }
+
+    .order-date {
+        font-size: 0.82rem;
+        color: rgba(255, 255, 255, 0.6);
+        margin: 0;
+    }
+
+    [data-theme="light"] .order-date {
+        color: #6c757d;
+    }
+
+    .order-card-body {
+        padding: 1.25rem 1.5rem;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 1.5rem;
+        align-items: center;
+    }
+
+    @media (max-width: 768px) {
+        .order-card-body {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .order-items-preview {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .item-thumbnail {
+        width: 58px;
+        height: 58px;
+        border-radius: 12px;
+        object-fit: cover;
+        background: #2a2e31;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    [data-theme="light"] .item-thumbnail {
+        background: #f8f9fa;
+        border-color: rgba(0, 0, 0, 0.08);
+    }
+
+    .item-thumbnail-placeholder {
+        width: 58px;
+        height: 58px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #2a2e31;
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 1.2rem;
+    }
+
+    .items-count-badge {
+        font-size: 0.8rem;
+        font-weight: 700;
+        padding: 0.4rem 0.75rem;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.85);
+    }
+
+    [data-theme="light"] .items-count-badge {
+        background: rgba(0, 0, 0, 0.06);
+        color: #333;
+    }
+
+    .order-price-box {
+        text-align: right;
+    }
+
+    @media (max-width: 768px) {
+        .order-price-box {
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+    }
+
+    .order-total-label {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: rgba(255, 255, 255, 0.6);
+        margin: 0;
+    }
+
+    [data-theme="light"] .order-total-label {
+        color: #6c757d;
+    }
+
+    .order-total-value {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: #f1e682;
+        margin: 0.2rem 0 0.5rem;
+    }
+
+    [data-theme="light"] .order-total-value {
+        color: #e67315;
+    }
+
+    .order-status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.4rem 0.85rem;
+        border-radius: 999px;
+        font-size: 0.82rem;
+        font-weight: 700;
+    }
+
+    .empty-orders {
+        text-align: center;
+        padding: 4rem 1.5rem;
+        background: #1e2225;
+        border: 1px dashed rgba(255, 255, 255, 0.15);
+        border-radius: 20px;
+    }
+
+    [data-theme="light"] .empty-orders {
+        background: #ffffff;
+        border-color: rgba(0, 0, 0, 0.15);
+    }
+
+    .empty-orders-icon {
+        width: 80px;
+        height: 80px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(230, 115, 21, 0.15);
+        color: #e67315;
+        font-size: 2.2rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .btn-track {
+        background: linear-gradient(135deg, #e67315, #f39c12);
+        color: #fff;
+        font-weight: 700;
+        border: none;
+        padding: 0.55rem 1.25rem;
+        border-radius: 10px;
+        transition: transform 0.15s ease, filter 0.15s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+
+    .btn-track:hover {
+        color: #fff;
+        transform: scale(1.02);
+        filter: brightness(1.08);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="orders-container">
+    <div class="orders-header">
+        <div>
+            <h1 class="orders-title">
+                {% if modo_ver_todos %}
+                    <i class="fas fa-boxes-packing text-warning me-2" aria-hidden="true"></i>Gestão de Pedidos da Loja
+                {% else %}
+                    <i class="fas fa-boxes-packing text-warning me-2" aria-hidden="true"></i>Meus Pedidos
+                {% endif %}
+            </h1>
+            <p class="orders-subtitle">
+                {% if modo_ver_todos %}
+                    Visão administrativa de todos os pedidos realizados pelos clientes.
+                {% else %}
+                    Acompanhe o estado de entrega e o histórico detalhado das suas compras.
+                {% endif %}
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            {% if user.is_staff %}
+                <a href="/admin/loja/pedido/" target="_blank" class="btn btn-info btn-sm fw-bold">
+                    <i class="fas fa-user-shield me-1"></i> Abrir Painel Admin
+                </a>
+            {% endif %}
+            <a href="{% url 'home' %}" class="btn btn-outline-warning btn-sm">
+                <i class="fas fa-arrow-left me-1"></i> Continuar a Comprar
+            </a>
+        </div>
+    </div>
+
+    {% if user.is_staff %}
+        <!-- BARRA DE SELEÇÃO STAFF (ADMIN) -->
+        <div class="admin-orders-toolbar">
+            <div class="btn-group" role="group" aria-label="Filtro de visão de pedidos">
+                <a href="{% url 'meus_pedidos' %}" class="btn btn-sm {% if modo_ver_todos %}btn-warning fw-bold{% else %}btn-outline-secondary{% endif %}">
+                    <i class="fas fa-users me-1"></i> Pedidos dos Clientes ({{ total_pedidos_loja }})
+                </a>
+                <a href="{% url 'meus_pedidos' %}?modo=meus" class="btn btn-sm {% if not modo_ver_todos %}btn-warning fw-bold{% else %}btn-outline-secondary{% endif %}">
+                    <i class="fas fa-user me-1"></i> Minhas Compras ({{ total_pedidos_pessoais }})
+                </a>
+            </div>
+
+            {% if modo_ver_todos %}
+                <form method="get" class="d-flex gap-2 align-items-center">
+                    <input type="text" name="q" value="{{ termo_busca }}" placeholder="Buscar cliente ou nº..." class="form-control form-control-sm" style="width: 220px;">
+                    <button type="submit" class="btn btn-sm btn-outline-warning">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    {% if termo_busca %}
+                        <a href="{% url 'meus_pedidos' %}" class="btn btn-sm btn-outline-secondary" title="Limpar busca">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    {% endif %}
+                </form>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% if pagina_pedidos.object_list %}
+        <div class="orders-list">
+            {% for pedido in pagina_pedidos.object_list %}
+                <article class="order-card">
+                    <header class="order-card-header">
+                        <div class="order-code-group">
+                            <div class="order-icon-badge">
+                                <i class="fas fa-box" aria-hidden="true"></i>
+                            </div>
+                            <div>
+                                <h2 class="order-code">{{ pedido.codigo_pedido }}</h2>
+                                <p class="order-date">
+                                    <i class="far fa-calendar-alt me-1"></i>{{ pedido.data_criacao|date:"d/m/Y às H:i" }}
+                                    {% if modo_ver_todos or pedido.usuario != user %}
+                                        <span class="badge bg-secondary ms-2">
+                                            <i class="fas fa-user me-1"></i> Cliente: <strong>{{ pedido.usuario.get_full_name|default:pedido.usuario.username }}</strong>
+                                        </span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="order-status-badge {{ pedido.badge_status.classe }}">
+                                <i class="{{ pedido.badge_status.icone }}" aria-hidden="true"></i>
+                                {{ pedido.badge_status.label }}
+                            </span>
+                            {% if user.is_staff %}
+                                <a href="/admin/loja/pedido/{{ pedido.id }}/change/" target="_blank" class="btn btn-sm btn-outline-secondary" title="Gerir no Django Admin">
+                                    <i class="fas fa-gear"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </header>
+
+                    <div class="order-card-body">
+                        <div>
+                            <div class="order-items-preview">
+                                {% for item in pedido.itens.all|slice:":4" %}
+                                    {% if item.produto.thumbnail %}
+                                        <img src="{{ item.produto.thumbnail.url }}" alt="{{ item.produto.nome }}" class="item-thumbnail" title="{{ item.quantidade }}x {{ item.produto.nome }}">
+                                    {% elif item.produto.imagem %}
+                                        <img src="{{ item.produto.imagem.url }}" alt="{{ item.produto.nome }}" class="item-thumbnail" title="{{ item.quantidade }}x {{ item.produto.nome }}">
+                                    {% else %}
+                                        <div class="item-thumbnail-placeholder" title="{{ item.quantidade }}x {{ item.produto.nome }}">
+                                            <i class="fas fa-cube"></i>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% with total_itens=pedido.itens.count %}
+                                    <span class="items-count-badge">
+                                        {{ total_itens }} {% if total_itens == 1 %}artigo{% else %}artigos{% endif %}
+                                    </span>
+                                {% endwith %}
+                            </div>
+                        </div>
+
+                        <div class="order-price-box">
+                            <div>
+                                <p class="order-total-label">Total do Pedido</p>
+                                <p class="order-total-value">{{ pedido.total|floatformat:2 }} Kz</p>
+                            </div>
+                            <a href="{% url 'detalhe_pedido' pedido.id %}" class="btn-track">
+                                <i class="fas fa-route" aria-hidden="true"></i> Rastrear Pedido
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+
+        {% if pagina_pedidos.has_other_pages %}
+            <nav aria-label="Navegação de páginas de pedidos" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if pagina_pedidos.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?pagina={{ pagina_pedidos.previous_page_number }}{% if not modo_ver_todos %}&modo=meus{% endif %}{% if termo_busca %}&q={{ termo_busca }}{% endif %}">Anterior</a>
+                        </li>
+                    {% endif %}
+                    {% for num in pagina_pedidos.paginator.page_range %}
+                        <li class="page-item {% if pagina_pedidos.number == num %}active{% endif %}">
+                            <a class="page-link" href="?pagina={{ num }}{% if not modo_ver_todos %}&modo=meus{% endif %}{% if termo_busca %}&q={{ termo_busca }}{% endif %}">{{ num }}</a>
+                        </li>
+                    {% endfor %}
+                    {% if pagina_pedidos.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?pagina={{ pagina_pedidos.next_page_number }}{% if not modo_ver_todos %}&modo=meus{% endif %}{% if termo_busca %}&q={{ termo_busca }}{% endif %}">Próximo</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    {% else %}
+        <div class="empty-orders">
+            <div class="empty-orders-icon">
+                <i class="fas fa-bag-shopping" aria-hidden="true"></i>
+            </div>
+            {% if modo_ver_todos %}
+                <h3>Nenhum pedido de cliente encontrado</h3>
+                <p class="text-muted mb-4">Os pedidos realizados pelos clientes aparecerão aqui e no painel admin.</p>
+            {% else %}
+                <h3>Ainda não realizou nenhum pedido</h3>
+                <p class="text-muted mb-4">Quando concluir a sua primeira compra, poderá acompanhar o rastreio e entrega aqui em tempo real.</p>
+                <a href="{% url 'home' %}" class="btn btn-warning px-4 py-2 fw-bold">
+                    <i class="fas fa-cart-shopping me-1"></i> Explorar Catálogo de Produtos
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

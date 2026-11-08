@@ -1,0 +1,15 @@
+[Unit]
+Description=MiraComerce Celery worker
+After=network.target redis.service mysql.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/srv/miracommerce
+EnvironmentFile=/etc/miracommerce.env
+ExecStart=/srv/miracommerce/.venv/bin/celery -A meu_ecommerce worker --loglevel=INFO
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

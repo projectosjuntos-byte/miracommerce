@@ -1,0 +1,15 @@
+[Unit]
+Description=MiraComerce Celery beat scheduler
+After=network.target redis.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/srv/miracommerce
+EnvironmentFile=/etc/miracommerce.env
+ExecStart=/srv/miracommerce/.venv/bin/celery -A meu_ecommerce beat --loglevel=INFO
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,125 @@
+{% extends "loja/base.html" %}
+{% load static %}
+
+{% block title %}Criar conta - MiraComerce{% endblock %}
+
+{% block content %}
+<section class="auth-page" aria-labelledby="registerTitle">
+    <div class="auth-wrap">
+        <div class="auth-layout">
+            <aside class="auth-story">
+                <a class="auth-brand" href="{% url 'home' %}" aria-label="Voltar à página inicial">
+                    <img src="{% static 'logo-mira.png' %}" alt="MiraComerce">
+                </a>
+                <div class="auth-story-copy">
+                    <h2>A sua próxima compra começa aqui.</h2>
+                    <p>Crie a sua conta para organizar os pedidos e comprar com os seus dados já guardados.</p>
+                </div>
+                <div class="auth-story-photo">
+                    <img src="{% static 'loja/img/auth-cadastro-despensa.jpg' %}" alt="Cesta de compras numa mercearia local">
+                </div>
+                <div class="auth-story-list" aria-label="Benefícios da conta">
+                    <div class="auth-story-item"><i class="fas fa-cart-shopping" aria-hidden="true"></i><span>Um checkout mais simples a cada pedido.</span></div>
+                    <div class="auth-story-item"><i class="fas fa-location-dot" aria-hidden="true"></i><span>A sua morada fica disponível para a entrega.</span></div>
+                </div>
+                <a class="auth-back-link" href="{% url 'home' %}"><i class="fas fa-arrow-left" aria-hidden="true"></i>Voltar à vitrine</a>
+            </aside>
+
+            <div class="auth-panel">
+                <div class="auth-panel-inner">
+                    <p class="auth-kicker">Criar conta</p>
+                    <h1 id="registerTitle" class="auth-heading">Vamos preparar a sua conta.</h1>
+                    <p class="auth-intro">Preencha os dados abaixo. Os campos serão usados para a sua conta e entrega.</p>
+
+                    {% if form.non_field_errors %}
+                    <div class="auth-alert" role="alert">{{ form.non_field_errors }}</div>
+                    {% endif %}
+
+                    <form method="post" class="auth-form">
+                        {% csrf_token %}
+                        <div class="auth-form-grid">
+                            <div class="auth-field">
+                                <label for="id_first_name">Primeiro nome</label>
+                                <input type="text" name="first_name" id="id_first_name" value="{{ form.first_name.value|default_if_none:'' }}" autocomplete="given-name" required{% if form.first_name.errors %} class="is-invalid" aria-describedby="first-name-error"{% endif %}>
+                                {% for error in form.first_name.errors %}<p id="first-name-error" class="auth-field-error">{{ error }}</p>{% endfor %}
+                            </div>
+                            <div class="auth-field">
+                                <label for="id_last_name">Último nome</label>
+                                <input type="text" name="last_name" id="id_last_name" value="{{ form.last_name.value|default_if_none:'' }}" autocomplete="family-name" required{% if form.last_name.errors %} class="is-invalid" aria-describedby="last-name-error"{% endif %}>
+                                {% for error in form.last_name.errors %}<p id="last-name-error" class="auth-field-error">{{ error }}</p>{% endfor %}
+                            </div>
+                            <div class="auth-field auth-field--wide">
+                                <label for="id_email">E-mail</label>
+                                <input type="email" name="email" id="id_email" value="{{ form.email.value|default_if_none:'' }}" autocomplete="email" spellcheck="false" required{% if form.email.errors %} class="is-invalid" aria-describedby="email-error"{% endif %}>
+                                {% for error in form.email.errors %}<p id="email-error" class="auth-field-error">{{ error }}</p>{% endfor %}
+                            </div>
+                            <div class="auth-field auth-field--wide">
+                                <label for="id_telefone">Telefone</label>
+                                <input type="tel" name="telefone" id="id_telefone" value="{{ form.telefone.value|default_if_none:'' }}" autocomplete="tel" required{% if form.telefone.errors %} class="is-invalid" aria-describedby="telefone-error"{% endif %}>
+                                {% for error in form.telefone.errors %}<p id="telefone-error" class="auth-field-error">{{ error }}</p>{% endfor %}
+                            </div>
+
+                            <p class="auth-section-label">Morada de entrega</p>
+                            <div class="auth-field">
+                                <label for="id_provincia">Província</label>
+                                <input type="text" name="provincia" id="id_provincia" value="{{ form.provincia.value|default_if_none:'' }}" autocomplete="address-level1" required{% if form.provincia.errors %} class="is-invalid" aria-describedby="provincia-error"{% endif %}>
+                                {% for error in form.provincia.errors %}<p id="provincia-error" class="auth-field-error">{{ error }}</p>{% endfor %}
+                            </div>
+                            <div class="auth-field">
+                                <label for="id_municipio">Município</label>
+                                <input type="text" name="municipio" id="id_municipio" value="{{ form.municipio.value|default_if_none:'' }}" autocomplete="address-level2" required{% if form.municipio.errors %} class="is-invalid" aria-describedby="municipio-error"{% endif %}>
+                                {% for error in form.municipio.errors %}<p id="municipio-error" class="auth-field-error">{{ error }}</p>{% endfor %}
+                            </div>
+                            <div class="auth-field auth-field--wide">
+                                <label for="id_bairro">Bairro</label>
+                                <input type="text" name="bairro" id="id_bairro" value="{{ form.bairro.value|default_if_none:'' }}" autocomplete="address-line1" required{% if form.bairro.errors %} class="is-invalid" aria-describedby="bairro-error"{% endif %}>
+                                {% for error in form.bairro.errors %}<p id="bairro-error" class="auth-field-error">{{ error }}</p>{% endfor %}
+                            </div>
+
+                            <p class="auth-section-label">Dados de acesso</p>
+                            <div class="auth-field auth-field--wide">
+                                <label for="id_username">Utilizador</label>
+                                <input type="text" name="username" id="id_username" value="{{ form.username.value|default_if_none:'' }}" autocomplete="username" required{% if form.username.errors %} class="is-invalid" aria-describedby="username-error"{% endif %}>
+                                {% for error in form.username.errors %}<p id="username-error" class="auth-field-error">{{ error }}</p>{% endfor %}
+                            </div>
+                            <div class="auth-field">
+                                <label for="id_password1">Senha</label>
+                                <input type="password" name="password1" id="id_password1" autocomplete="new-password" required{% if form.password1.errors %} class="is-invalid" aria-describedby="password1-error"{% endif %}>
+                                {% for error in form.password1.errors %}<p id="password1-error" class="auth-field-error">{{ error }}</p>{% endfor %}
+                            </div>
+                            <div class="auth-field">
+                                <label for="id_password2">Confirmar senha</label>
+                                <input type="password" name="password2" id="id_password2" autocomplete="new-password" required{% if form.password2.errors %} class="is-invalid" aria-describedby="password2-error"{% endif %}>
+                                {% for error in form.password2.errors %}<p id="password2-error" class="auth-field-error">{{ error }}</p>{% endfor %}
+                            </div>
+                        </div>
+                        <button type="submit" class="auth-submit">Criar a minha conta <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+                    </form>
+
+                    <div class="auth-meta">
+                        <span>Já tem conta? <a href="{% url 'login' %}">Entrar</a></span>
+                        <span>Precisa de ajuda? <a href="{% url 'faq' %}">Ver FAQ</a></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script nonce="{{ request.csp_nonce }}">
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('.auth-form');
+        if (form) {
+            form.addEventListener('submit', function () {
+                const btn = form.querySelector('.auth-submit');
+                if (btn && !btn.disabled) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2" aria-hidden="true"></i> A criar a conta...';
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

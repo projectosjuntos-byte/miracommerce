@@ -1,0 +1,54 @@
+[tool.ruff]
+line-length = 120
+exclude = ["archive", "media", "static", "img"]
+
+[tool.ruff.lint]
+select = ["E9", "F63", "F7", "F82"]
+
+[tool.coverage.run]
+branch = true
+source = ["loja", "meu_ecommerce"]
+omit = [
+    "*/migrations/*",
+    "*/tests.py",
+    "manage.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__.:",
+]
+
+[tool.mypy]
+python_version = "3.13"
+django_settings_module = "meu_ecommerce.settings"
+plugins = ["mypy_django_plugin.main"]
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+strict_optional = true
+show_error_codes = true
+pretty = true
+ignore_missing_imports = true
+explicit_package_bases = true
+namespace_packages = true
+follow_imports = "normal"
+
+[[tool.mypy.overrides]]
+module = [
+    "django.*",
+    "django_stubs.*",
+    "celery.*",
+    "redis.*",
+    "PIL.*",
+    "reportlab.*",
+    "boto3.*",
+    "sentry_sdk.*",
+    "prometheus_client.*",
+]
+ignore_missing_imports = true

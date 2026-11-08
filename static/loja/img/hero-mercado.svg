@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="700" viewBox="0 0 1600 700" role="img" aria-labelledby="title desc">
+  <title id="title">Mercado com produtos frescos</title>
+  <desc id="desc">Ilustração abstrata de uma banca de mercado</desc>
+  <defs><linearGradient id="sky" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#343b39"/><stop offset="1" stop-color="#111516"/></linearGradient><linearGradient id="awning" x1="0" x2="1"><stop stop-color="#e67315"/><stop offset="1" stop-color="#f1e682"/></linearGradient></defs>
+  <rect width="1600" height="700" fill="url(#sky)"/>
+  <circle cx="1310" cy="170" r="230" fill="#f1e682" opacity=".12"/><circle cx="1410" cy="260" r="130" fill="#e67315" opacity=".2"/>
+  <path d="M180 235h1050l-75 95H250z" fill="url(#awning)" opacity=".95"/>
+  <path d="M260 330h900v250H260z" fill="#1a1d1e" stroke="#f1e682" stroke-opacity=".35" stroke-width="5"/>
+  <path d="M315 510c30-130 190-135 220 0zM615 510c20-150 190-150 215 0zM900 510c30-120 170-120 200 0z" fill="#e67315" opacity=".85"/>
+  <circle cx="420" cy="410" r="45" fill="#f1e682"/><circle cx="720" cy="395" r="52" fill="#e67315"/><circle cx="1000" cy="410" r="45" fill="#f1e682"/>
+  <path d="M0 600h1600v100H0z" fill="#0d1011"/>
+</svg>

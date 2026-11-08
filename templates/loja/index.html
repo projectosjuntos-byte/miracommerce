@@ -1,0 +1,565 @@
+{% extends "loja/base.html" %}
+{% load static %}
+
+{% block title %}MiraComerce IA - Vitrine inteligente{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'loja/css/home.css' %}?v=home-20261107" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated and user.is_staff and not request.GET.modo_vitrine %}
+<section class="admin-overview">
+    <!-- CABEÇALHO DO PAINEL -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="pulse-dot"></span>
+                <span class="hero-kicker mb-0">Painel Administrativo • Visão da Operação</span>
+            </div>
+            <h1 class="mb-1">Central de Gestão MiraComerce</h1>
+            <p class="mb-0">Monitore receita, atenda pedidos de clientes, gerencie estoque e acompanhe a IA em tempo real.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="?modo_vitrine=1" class="btn btn-outline-warning">
+                <i class="fas fa-store me-2" aria-hidden="true"></i>Ver Vitrine da Loja
+            </a>
+            <a href="/admin/" target="_blank" class="btn btn-warning fw-bold text-dark">
+                <i class="fas fa-screwdriver-wrench me-2" aria-hidden="true"></i>Django Admin
+            </a>
+        </div>
+    </div>
+
+    <!-- ATALHOS RÁPIDOS DA OPERAÇÃO -->
+    <div class="row g-2 mb-4">
+        <div class="col-6 col-lg-3">
+            <a href="{% url 'meus_pedidos' %}" class="btn-action-card">
+                <i class="fas fa-boxes-packing text-warning" aria-hidden="true"></i>
+                <div>
+                    <strong>Gerir Pedidos</strong>
+                    <small>Rastreio e despacho</small>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-lg-3">
+            <a href="/admin/loja/produto/add/" target="_blank" class="btn-action-card">
+                <i class="fas fa-circle-plus text-success" aria-hidden="true"></i>
+                <div>
+                    <strong>Novo Produto</strong>
+                    <small>Cadastrar no estoque</small>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-lg-3">
+            <a href="{% url 'relatorio_vendas' %}" class="btn-action-card">
+                <i class="fas fa-chart-line text-info" aria-hidden="true"></i>
+                <div>
+                    <strong>Relatório de Vendas</strong>
+                    <small>PDF, CSV e gráficos</small>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-lg-3">
+            <a href="/admin/loja/categoria/" target="_blank" class="btn-action-card">
+                <i class="fas fa-layer-group text-primary" aria-hidden="true"></i>
+                <div>
+                    <strong>Categorias & Menus</strong>
+                    <small>Organizar catálogo</small>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- CARDS DE MÉTRICAS / KPIS -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="admin-metric accent">
+                <div class="admin-metric-header">
+                    <span>Faturamento Total</span>
+                    <i class="fas fa-coins text-warning" aria-hidden="true"></i>
+                </div>
+                <strong>{{ total_receita|stringformat:".2f" }} Kz</strong>
+                <small>Receita bruta acumulada em vendas</small>
+            </div>
+        </div>
+        <div class="col-6 col-sm-6 col-lg-2">
+            <div class="admin-metric">
+                <div class="admin-metric-header">
+                    <span>Vendas</span>
+                    <i class="fas fa-receipt text-muted" aria-hidden="true"></i>
+                </div>
+                <strong>{{ total_vendas_quantidade|default:"0" }}</strong>
+                <small>Total de transações</small>
+            </div>
+        </div>
+        <div class="col-6 col-sm-6 col-lg-2">
+            <div class="admin-metric">
+                <div class="admin-metric-header">
+                    <span>A Despachar</span>
+                    <i class="fas fa-box-open {% if pedidos_pendentes_count %}text-warning{% else %}text-muted{% endif %}" aria-hidden="true"></i>
+                </div>
+                <strong>{{ pedidos_pendentes_count|default:"0" }}</strong>
+                <small>{% if pedidos_pendentes_count %}<span class="text-warning fw-bold">Requer atenção</span>{% else %}Tudo em dia{% endif %}</small>
+            </div>
+        </div>
+        <div class="col-6 col-sm-6 col-lg-2">
+            <div class="admin-metric">
+                <div class="admin-metric-header">
+                    <span>Ticket Médio</span>
+                    <i class="fas fa-chart-pie text-muted" aria-hidden="true"></i>
+                </div>
+                <strong style="font-size: 1.4rem;">{{ ticket_medio|stringformat:".2f" }} Kz</strong>
+                <small>Média por pedido</small>
+            </div>
+        </div>
+        <div class="col-6 col-sm-6 col-lg-2">
+            <div class="admin-metric">
+                <div class="admin-metric-header">
+                    <span>Clientes</span>
+                    <i class="fas fa-user-plus text-muted" aria-hidden="true"></i>
+                </div>
+                <strong>{{ novos_clientes_count|default:"0" }}</strong>
+                <small>Últimos 30 dias</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABELA DE PEDIDOS RECENTES DOS CLIENTES -->
+    <div class="admin-panel mb-4">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+            <div>
+                <h2 class="mb-1"><i class="fas fa-boxes-stacked me-2 text-warning" aria-hidden="true"></i>Últimos Pedidos dos Clientes</h2>
+                <p class="small text-muted mb-0">Acompanhe novos pedidos feitos na loja e acesse o rastreamento em tempo real.</p>
+            </div>
+            <a href="{% url 'meus_pedidos' %}" class="btn btn-sm btn-outline-warning">
+                Ver todos os pedidos <i class="fas fa-arrow-right ms-1" aria-hidden="true"></i>
+            </a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table admin-table align-middle">
+                <thead>
+                    <tr>
+                        <th scope="col">Pedido</th>
+                        <th scope="col">Cliente</th>
+                        <th scope="col">Data</th>
+                        <th scope="col">Itens</th>
+                        <th scope="col">Total</th>
+                        <th scope="col">Status</th>
+                        <th scope="col" class="text-end">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in pedidos_recentes %}
+                    <tr>
+                        <td>
+                            <strong class="text-warning">{{ p.codigo_pedido }}</strong>
+                        </td>
+                        <td>
+                            <i class="fas fa-user-circle me-1 text-muted" aria-hidden="true"></i>
+                            <strong>{{ p.usuario.get_full_name|default:p.usuario.username }}</strong>
+                        </td>
+                        <td class="text-nowrap small text-muted">
+                            {{ p.data_criacao|date:"d/m/Y H:i" }}
+                        </td>
+                        <td>
+                            <span class="badge bg-dark border border-secondary text-light">
+                                {{ p.itens.count }} item{{ p.itens.count|pluralize:"ns" }}
+                            </span>
+                        </td>
+                        <td class="text-nowrap">
+                            <strong>{{ p.total|stringformat:".2f" }} Kz</strong>
+                        </td>
+                        <td>
+                            <span class="badge {{ p.badge_status.classe }}">
+                                <i class="{{ p.badge_status.icone }} me-1" aria-hidden="true"></i>{{ p.badge_status.label }}
+                            </span>
+                        </td>
+                        <td class="text-end text-nowrap">
+                            <a href="{% url 'detalhe_pedido' p.id %}" class="btn btn-sm btn-outline-warning me-1" title="Acompanhar rastreio na timeline">
+                                <i class="fas fa-route me-1" aria-hidden="true"></i>Rastrear
+                            </a>
+                            <a href="/admin/loja/pedido/{{ p.id }}/change/" target="_blank" class="btn btn-sm btn-outline-secondary" title="Editar no Django Admin">
+                                <i class="fas fa-pen-to-square" aria-hidden="true"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            <i class="fas fa-receipt fa-2x mb-2 d-block opacity-50" aria-hidden="true"></i>
+                            Nenhum pedido registrado ainda na loja.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- PRODUTOS MAIS PROCURADOS & ALERTAS -->
+    <div class="row g-3 mb-4">
+        <div class="col-lg-6">
+            <section class="admin-panel h-100">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h2 class="mb-0"><i class="fas fa-fire me-2 text-danger" aria-hidden="true"></i>Produtos Mais Procurados</h2>
+                    <span class="badge bg-dark border text-muted">Últimos 7 dias</span>
+                </div>
+                {% if tendencia %}
+                <div class="p-3 mb-3 rounded" style="background: rgba(230, 115, 21, 0.12); border: 1px solid rgba(230, 115, 21, 0.3);">
+                    <small class="text-warning fw-bold text-uppercase d-block mb-1">
+                        <i class="fas fa-bolt me-1" aria-hidden="true"></i>Produto em Maior Tendência
+                    </small>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <strong class="fs-5 text-white">{{ tendencia.produto__nome }}</strong>
+                        <span class="badge bg-warning text-dark fw-bold">{{ tendencia.total }} venda{{ tendencia.total|pluralize:"s" }}</span>
+                    </div>
+                </div>
+                {% endif %}
+                <ul class="mb-0 ps-3">
+                    {% for item in top_vendidos %}
+                    <li><strong>{{ item.produto__nome }}</strong> — {{ item.total }} venda{{ item.total|pluralize:"s" }}</li>
+                    {% empty %}
+                    <li class="text-muted">Ainda não existem vendas suficientes para apresentar tendências.</li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </div>
+        <div class="col-lg-6">
+            <section class="admin-panel h-100">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h2 class="mb-0"><i class="fas fa-triangle-exclamation me-2 text-warning" aria-hidden="true"></i>Centro de Alertas</h2>
+                    <span class="badge bg-danger">{{ alertas|length|add:alertas_validade|length }} alertas</span>
+                </div>
+
+                <div class="mb-3">
+                    <h6 class="text-warning small text-uppercase fw-bold mb-2">
+                        <i class="fas fa-boxes-stacked me-1" aria-hidden="true"></i>Estoque Baixo (&le; 5 unidades)
+                    </h6>
+                    <ul class="mb-0 ps-3">
+                        {% for item in alertas %}
+                        <li>
+                            <strong>{{ item.nome }}</strong> — 
+                            <span class="badge bg-danger bg-opacity-75">{{ item.quantidade_estoque }} restante{{ item.quantidade_estoque|pluralize:"s" }}</span>
+                            <a href="/admin/loja/produto/{{ item.id }}/change/" target="_blank" class="small text-warning ms-1" title="Ajustar estoque no admin">
+                                <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                            </a>
+                        </li>
+                        {% empty %}
+                        <li class="text-success small"><i class="fas fa-check-circle me-1" aria-hidden="true"></i>Estoque regularizado.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                {% if alertas_validade %}
+                <div class="pt-3 border-top border-secondary border-opacity-25">
+                    <h6 class="text-warning small text-uppercase fw-bold mb-2">
+                        <i class="fas fa-calendar-xmark me-1" aria-hidden="true"></i>Próximos do Vencimento (90 dias)
+                    </h6>
+                    <ul class="mb-0 ps-3">
+                        {% for item in alertas_validade %}
+                        <li>
+                            <strong>{{ item.nome }}</strong> — 
+                            <span class="badge bg-warning text-dark">Validade: {{ item.data_validade|date:"d/m/Y" }}</span>
+                            {% if item.em_promocao %}
+                            <span class="badge bg-success ms-1">Em Promoção</span>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </section>
+        </div>
+    </div>
+
+    <!-- SEÇÃO: INTELIGÊNCIA ARTIFICIAL MIRACOMERCE (APRIORI) -->
+    <div class="admin-panel">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+            <div>
+                <h2 class="mb-1"><i class="fas fa-brain me-2 text-warning" aria-hidden="true"></i>Motor de Inteligência Artificial & Recomendações</h2>
+                <p class="small text-muted mb-0">Mineração de Regras de Associação (Algoritmo Apriori) baseada no comportamento de compra dos clientes.</p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="ai-badge"><i class="fas fa-microchip" aria-hidden="true"></i>Apriori Ativo</span>
+            </div>
+        </div>
+
+        <div class="row g-2">
+            {% for sug in sugestoes %}
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="rule-pill h-100">
+                    <i class="fas fa-wand-magic-sparkles flex-shrink-0" aria-hidden="true"></i>
+                    <span>{{ sug }}</span>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <p class="text-muted small mb-0">O modelo de mineração de regras está processando os dados de transações para sugerir novas combinações.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% else %}
+{% if user.is_authenticated and user.is_staff and request.GET.modo_vitrine %}
+<div class="alert alert-warning d-flex align-items-center justify-content-between mb-0 border-0 rounded-0 py-2 px-3 shadow-sm sticky-top" style="z-index: 1050;">
+    <div>
+        <i class="fas fa-crown text-warning me-2" aria-hidden="true"></i>
+        <strong>Modo Vitrine Ativo (Administrador)</strong> — Visualizando o catálogo e a loja como cliente.
+    </div>
+    <a href="{% url 'home' %}" class="btn btn-dark btn-sm fw-bold">
+        <i class="fas fa-arrow-left me-1" aria-hidden="true"></i>Voltar ao Painel da Operação
+    </a>
+</div>
+{% endif %}
+<div class="market-home">
+    <div class="market-wrap">
+        <section class="home-hero" aria-labelledby="home-title">
+            <div class="hero-copy">
+                <p class="hero-kicker">MiraComerce IA</p>
+                <h1 id="home-title" class="hero-title">O seu mercado, no <em>ritmo</em> do seu dia.</h1>
+                <p class="hero-lede">Frescos, essenciais e ofertas escolhidos para deixar a compra diária mais simples.</p>
+                <a class="hero-cta" href="#produtos-ancora">Explorar produtos <i class="fas fa-arrow-down" aria-hidden="true"></i></a>
+            </div>
+            <div class="hero-art" aria-hidden="true">
+                <img src="{% static 'loja/img/hero-mercado-original.jpg' %}" width="2000" height="1500" fetchpriority="high" alt="">
+            </div>
+        </section>
+
+        <section class="shop-promise home-reveal" aria-label="Benefícios da MiraComerce">
+            <div class="promise-item">
+                <strong>Frete grátis acima de 25.000 Kz</strong>
+                <span>Mais valor para a sua compra, sem complicações.</span>
+            </div>
+            <div class="promise-item">
+                <strong>Escolhas que fazem sentido</strong>
+                <span>Recomendações guiadas pelo que os clientes costumam levar juntos.</span>
+            </div>
+            <div class="promise-item">
+                <strong>Catálogo sempre acessível</strong>
+                <span>Explore categorias, compare opções e monte o carrinho no seu ritmo.</span>
+            </div>
+        </section>
+
+        <section class="category-stage" aria-labelledby="categorias-title">
+            <div class="section-heading home-reveal">
+                <h2 id="categorias-title">Comece por aquilo que precisa hoje.</h2>
+                <p>Cada categoria abre um caminho direto para os produtos certos, sem perder o contexto da sua compra.</p>
+            </div>
+
+            {% if categorias_vitrine %}
+            <div class="category-gallery">
+                {% for item in categorias_vitrine %}
+                <a class="category-tile home-reveal" data-reveal-delay="{{ forloop.counter0 }}" href="{% url 'categoria_filtro' item.categoria.id %}#produtos-ancora">
+                    {% if item.imagem %}
+                    <img src="{% static item.imagem %}" width="1600" height="1200" loading="lazy" alt="{{ item.categoria.nome }}">
+                    {% else %}
+                    <div class="category-tile-fallback" aria-hidden="true"><i class="fas fa-basket-shopping"></i></div>
+                    {% endif %}
+                    <span>{{ item.categoria.nome }}</span>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="category-empty home-reveal">As categorias serão apresentadas aqui assim que o catálogo for organizado.</p>
+            {% endif %}
+        </section>
+
+        <section id="produtos-ancora" class="catalog-stage" aria-labelledby="produtos-title">
+            <div class="catalog-header home-reveal">
+                <div class="catalog-heading">
+                    <h2 id="produtos-title">Produtos prontos para entrar no seu carrinho.</h2>
+                    <div class="catalog-meta-info mt-2 d-flex flex-wrap align-items-center gap-2">
+                        <span class="badge bg-dark border text-muted">
+                            <i class="fas fa-boxes-stacked me-1 text-warning"></i>
+                            {{ total_produtos }} artigo{{ total_produtos|pluralize:"s" }} disponível{{ total_produtos|pluralize:"eis" }}
+                        </span>
+                        {% if categoria_ativa %}
+                            <span class="catalog-filter"><i class="fas fa-layer-group me-1"></i>{{ categoria_ativa.nome }}</span>
+                        {% endif %}
+                        {% if subcategoria_ativa %}
+                            <span class="catalog-filter is-subcategory"><i class="fas fa-tags me-1"></i>{{ subcategoria_ativa.nome }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- BARRA DE CONTROLE: ORDENAÇÃO E FILTROS DE PREÇO -->
+            <div class="catalog-controls-card home-reveal mb-4">
+                <form method="GET" action="{{ request.path }}#produtos-ancora" class="catalog-controls-form" id="catalog-filters-form">
+                    {% if termo_busca %}
+                        <input type="hidden" name="q" value="{{ termo_busca }}">
+                    {% endif %}
+
+                    <div class="controls-main-row">
+                        <!-- 1. ORDENAÇÃO -->
+                        <div class="control-group sort-group">
+                            <label for="id_ordenar" class="control-label">
+                                <i class="fas fa-arrow-down-short-wide text-warning me-1" aria-hidden="true"></i>
+                                <span>Ordenar:</span>
+                            </label>
+                            <select id="id_ordenar" name="ordenar" class="catalog-select">
+                                <option value="padrao" {% if ordenar == 'padrao' %}selected{% endif %}>Relevância / Padrão</option>
+                                <option value="menor_preco" {% if ordenar == 'menor_preco' %}selected{% endif %}>Menor Preço (↑)</option>
+                                <option value="maior_preco" {% if ordenar == 'maior_preco' %}selected{% endif %}>Maior Preço (↓)</option>
+                                <option value="nome_asc" {% if ordenar == 'nome_asc' %}selected{% endif %}>Nome: A a Z</option>
+                                <option value="nome_desc" {% if ordenar == 'nome_desc' %}selected{% endif %}>Nome: Z a A</option>
+                                <option value="em_promocao" {% if ordenar == 'em_promocao' %}selected{% endif %}>Ofertas & Promoções</option>
+                                <option value="mais_novos" {% if ordenar == 'mais_novos' %}selected{% endif %}>Mais Recentes</option>
+                            </select>
+                        </div>
+
+                        <!-- 2. FAIXA DE PREÇO MANUAL -->
+                        <div class="control-group price-group">
+                            <label class="control-label">
+                                <i class="fas fa-coins text-warning me-1" aria-hidden="true"></i>
+                                <span>Preço (Kz):</span>
+                            </label>
+                            <div class="price-inputs-wrapper">
+                                <input type="number" name="preco_min" id="id_preco_min" value="{{ preco_min }}" placeholder="Mín" min="0" step="100" class="catalog-input" aria-label="Preço Mínimo em Kwanzas">
+                                <span class="price-separator">—</span>
+                                <input type="number" name="preco_max" id="id_preco_max" value="{{ preco_max }}" placeholder="Máx" min="0" step="100" class="catalog-input" aria-label="Preço Máximo em Kwanzas">
+                                <button type="submit" class="btn-filter-apply" title="Aplicar filtro de preço">
+                                    <i class="fas fa-filter me-1" aria-hidden="true"></i> Filtrar
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 3. TOGGLE APENAS PROMOÇÕES -->
+                        <div class="control-group promo-group">
+                            <label class="promo-checkbox-label {% if apenas_promocao %}is-checked{% endif %}" for="id_promo_toggle">
+                                <input type="checkbox" name="promo" id="id_promo_toggle" value="1" {% if apenas_promocao %}checked{% endif %} class="visually-hidden">
+                                <span class="promo-badge-text">
+                                    <i class="fas fa-fire text-danger" aria-hidden="true"></i>
+                                    Apenas Promoções
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- PRESETS RÁPIDOS DE PREÇO -->
+                <div class="price-presets-row">
+                    <span class="presets-label"><i class="fas fa-sliders me-1"></i> Faixas rápidas:</span>
+                    <div class="presets-chips">
+                        {% for preset in presets_preco %}
+                            <a href="{{ preset.url }}" class="preset-chip {% if preset.ativo %}is-active{% endif %}">
+                                {{ preset.label }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- TAGS DE FILTROS ATIVOS -->
+                {% if filtros_ativos %}
+                <div class="active-filters-row">
+                    <span class="active-filters-label">Filtros aplicados:</span>
+                    <div class="active-filters-chips">
+                        {% for f in filtros_ativos %}
+                            <a href="{{ f.url_remover }}" class="active-filter-tag" title="Remover filtro {{ f.label }}">
+                                <span>{{ f.label }}</span>
+                                <i class="fas fa-times ms-1" aria-hidden="true"></i>
+                            </a>
+                        {% endfor %}
+                        <a href="{{ url_limpar_tudo }}" class="btn-clear-all-filters">
+                            <i class="fas fa-trash-can me-1" aria-hidden="true"></i> Limpar filtros
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="product-grid">
+                {% for produto in produtos %}
+                <article class="product-card home-reveal" data-reveal-delay="{{ forloop.counter0 }}">
+                    <div class="product-image">
+                        <img src="{% if produto.thumbnail %}{{ produto.thumbnail.url }}{% elif produto.imagem %}{{ produto.imagem.url }}{% else %}{% static 'loja/img/produto-placeholder.svg' %}{% endif %}" alt="{% if produto.imagem %}{{ produto.nome }}{% else %}Imagem indisponível para {{ produto.nome }}{% endif %}" width="400" height="400" loading="lazy">
+                    </div>
+                    <div class="product-body">
+                        <p class="product-category">{{ produto.categoria }}</p>
+                        <h3 class="product-name">{{ produto.nome }}</h3>
+                        <p class="product-subcategory">{% if produto.subcategoria %}{{ produto.subcategoria.nome }}{% else %}{{ produto.categoria.nome }}{% endif %}</p>
+                        <div class="product-bottom">
+                            <div>
+                                {% if produto.em_promocao %}
+                                <span class="product-old-price">{{ produto.preco|stringformat:".2f" }} Kz</span>
+                                <div class="product-price is-sale">{{ produto.preco_promocional|stringformat:".2f" }} <small>Kz</small></div>
+                                {% else %}
+                                <div class="product-price">{{ produto.preco|stringformat:".2f" }} <small>Kz</small></div>
+                                {% endif %}
+                            </div>
+                            {% if produto.quantidade_estoque > 0 %}
+                            <button type="button" data-url="{% url 'adicionar_ao_carrinho' produto.id %}" class="product-add btn-ajax-cart" aria-label="Adicionar {{ produto.nome }} ao carrinho">
+                                <i class="fas fa-plus" aria-hidden="true"></i>
+                            </button>
+                            {% else %}
+                            <button type="button" class="product-add" disabled aria-label="{{ produto.nome }} está esgotado">
+                                <i class="fas fa-minus" aria-hidden="true"></i>
+                                <span class="visually-hidden">ESGOTADO</span>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </article>
+                {% empty %}
+                <div class="catalog-empty home-reveal">
+                    <h3>Nenhum produto encontrado.</h3>
+                    <p class="mb-2">Não encontramos produtos correspondentes aos filtros selecionados.</p>
+                    {% if filtros_ativos %}
+                    <a href="{{ url_limpar_tudo }}" class="btn btn-sm btn-outline-warning mt-2">
+                        <i class="fas fa-rotate-left me-1"></i> Limpar Filtros e Ver Todos
+                    </a>
+                    {% else %}
+                    <p class="mb-0 text-muted small">Atualize a loja mais tarde ou escolha outra categoria.</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if pagina_produtos.has_other_pages %}
+            <nav class="mt-4 home-reveal" aria-label="Paginação do catálogo">
+                <ul class="pagination justify-content-center mb-0">
+                    {% if pagina_produtos.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?pagina={{ pagina_produtos.previous_page_number }}{% if querystring_base %}&amp;{{ querystring_base }}{% endif %}#produtos-ancora">Anterior</a></li>
+                    {% endif %}
+                    <li class="page-item active" aria-current="page"><span class="page-link">Página {{ pagina_produtos.number }} de {{ pagina_produtos.paginator.num_pages }}</span></li>
+                    {% if pagina_produtos.has_next %}
+                    <li class="page-item"><a class="page-link" href="?pagina={{ pagina_produtos.next_page_number }}{% if querystring_base %}&amp;{{ querystring_base }}{% endif %}#produtos-ancora">Seguinte</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </section>
+    </div>
+</div>
+
+<div id="toast-ia" class="toast-ia" role="status" aria-live="polite">
+    <i class="fas fa-shopping-bag" aria-hidden="true"></i><span id="toast-message">Adicionado ao carrinho.</span>
+</div>
+<form id="cart-csrf-form" class="d-none">{% csrf_token %}</form>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'loja/js/store.js' %}" defer></script>
+<script src="{% static 'loja/js/home-experience.js' %}" defer></script>
+<script nonce="{{ request.csp_nonce }}">
+    document.addEventListener('DOMContentLoaded', function() {
+        const sortSelect = document.getElementById('id_ordenar');
+        const promoToggle = document.getElementById('id_promo_toggle');
+        const form = document.getElementById('catalog-filters-form');
+
+        if (sortSelect && form) {
+            sortSelect.addEventListener('change', function() {
+                form.submit();
+            });
+        }
+        if (promoToggle && form) {
+            promoToggle.addEventListener('change', function() {
+                form.submit();
+            });
+        }
+    });
+</script>
+{% endblock %}

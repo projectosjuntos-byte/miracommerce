@@ -1,0 +1,18 @@
+[Unit]
+Description=MiraComerce Gunicorn web service
+After=network.target redis.service mysql.service
+
+[Service]
+Type=notify
+User=www-data
+Group=www-data
+WorkingDirectory=/srv/miracommerce
+EnvironmentFile=/etc/miracommerce.env
+RuntimeDirectory=miracommerce
+ExecStart=/srv/miracommerce/.venv/bin/gunicorn --workers 3 --timeout 120 --bind unix:/run/miracommerce/gunicorn.sock meu_ecommerce.wsgi:application
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=on-failure
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

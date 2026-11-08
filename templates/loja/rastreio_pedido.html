@@ -1,0 +1,751 @@
+{% extends "loja/base.html" %}
+{% load static %}
+
+{% block title %}Rastreio {{ pedido.codigo_pedido }} - MiraComerce IA{% endblock %}
+
+{% block extra_css %}
+<style nonce="{{ request.csp_nonce }}">
+    .tracking-page {
+        max-width: 1100px;
+        margin: 2rem auto 5rem;
+        padding: 0 1rem;
+    }
+
+    .tracking-top-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .tracking-headline h1 {
+        font-size: 1.85rem;
+        font-weight: 800;
+        margin: 0;
+        letter-spacing: -0.02em;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .tracking-headline p {
+        margin: 0.25rem 0 0;
+        color: rgba(255, 255, 255, 0.65);
+        font-size: 0.95rem;
+    }
+
+    [data-theme="light"] .tracking-headline p {
+        color: #6c757d;
+    }
+
+    /* CARD PRINCIPAL DA TIMELINE */
+    .timeline-card {
+        background: #1e2225;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 22px;
+        padding: 2.25rem 2rem;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+    }
+
+    [data-theme="light"] .timeline-card {
+        background: #ffffff;
+        border-color: rgba(0, 0, 0, 0.08);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    }
+
+    .timeline-status-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 2.5rem;
+        padding-bottom: 1.25rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    [data-theme="light"] .timeline-status-header {
+        border-bottom-color: rgba(0, 0, 0, 0.07);
+    }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1.25rem;
+        border-radius: 999px;
+        font-size: 0.95rem;
+        font-weight: 750;
+    }
+
+    /* TRACKER VISUAL HORIZONTAL */
+    .stepper-wrapper {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        margin: 1.5rem 0 2rem;
+    }
+
+    /* Linha de conexão do progresso */
+    .stepper-progress-track {
+        position: absolute;
+        top: 25px;
+        left: 5%;
+        right: 5%;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 999px;
+        z-index: 1;
+    }
+
+    [data-theme="light"] .stepper-progress-track {
+        background: rgba(0, 0, 0, 0.09);
+    }
+
+    .stepper-progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #e67315, #f1e682);
+        border-radius: 999px;
+        transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stepper-item {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+        text-align: center;
+        padding: 0 0.5rem;
+    }
+
+    .step-circle {
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        background: #252a2e;
+        color: rgba(255, 255, 255, 0.4);
+        border: 3px solid rgba(255, 255, 255, 0.12);
+        transition: all 0.3s ease;
+        margin-bottom: 0.85rem;
+    }
+
+    [data-theme="light"] .step-circle {
+        background: #f1f3f5;
+        color: #adb5bd;
+        border-color: #dee2e6;
+    }
+
+    /* Etapa Concluída */
+    .stepper-item.completed .step-circle {
+        background: #198754;
+        color: #ffffff;
+        border-color: #20c997;
+        box-shadow: 0 0 16px rgba(25, 135, 84, 0.4);
+    }
+
+    /* Etapa Atual / Ativa */
+    .stepper-item.current .step-circle {
+        background: #e67315;
+        color: #ffffff;
+        border-color: #f1e682;
+        box-shadow: 0 0 20px rgba(230, 115, 21, 0.6);
+        animation: pulse-ring 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse-ring {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.08);
+            border-color: #fff;
+        }
+    }
+
+    .step-label {
+        font-weight: 750;
+        font-size: 0.92rem;
+        color: rgba(255, 255, 255, 0.5);
+        margin-bottom: 0.2rem;
+    }
+
+    [data-theme="light"] .step-label {
+        color: #6c757d;
+    }
+
+    .stepper-item.completed .step-label,
+    .stepper-item.current .step-label {
+        color: #ffffff;
+    }
+
+    [data-theme="light"] .stepper-item.completed .step-label,
+    [data-theme="light"] .stepper-item.current .step-label {
+        color: #1a1d1e;
+    }
+
+    .step-subtext {
+        font-size: 0.78rem;
+        color: rgba(255, 255, 255, 0.45);
+        max-width: 150px;
+        line-height: 1.35;
+    }
+
+    [data-theme="light"] .step-subtext {
+        color: #868e96;
+    }
+
+    .step-timestamp {
+        display: inline-block;
+        margin-top: 0.35rem;
+        font-size: 0.73rem;
+        font-weight: 600;
+        color: #f1e682;
+        background: rgba(241, 230, 130, 0.12);
+        padding: 0.15rem 0.5rem;
+        border-radius: 6px;
+    }
+
+    [data-theme="light"] .step-timestamp {
+        color: #b75404;
+        background: rgba(230, 115, 21, 0.12);
+    }
+
+    /* Adaptação Mobile para timeline vertical */
+    @media (max-width: 768px) {
+        .stepper-wrapper {
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-left: 1.25rem;
+        }
+
+        .stepper-progress-track {
+            left: 27px;
+            top: 25px;
+            bottom: 25px;
+            width: 4px;
+            height: auto;
+            right: auto;
+        }
+
+        .stepper-progress-fill {
+            width: 100% !important;
+            height: var(--progresso-mobile, 40%);
+        }
+
+        .stepper-item {
+            flex-direction: row;
+            align-items: flex-start;
+            text-align: left;
+            gap: 1rem;
+            padding: 0;
+        }
+
+        .step-circle {
+            margin-bottom: 0;
+            flex-shrink: 0;
+        }
+
+        .step-subtext {
+            max-width: 100%;
+        }
+    }
+
+    /* GRID DE DETALHES */
+    .details-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 1.75rem;
+    }
+
+    @media (max-width: 992px) {
+        .details-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .detail-card {
+        background: #1e2225;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 18px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    [data-theme="light"] .detail-card {
+        background: #ffffff;
+        border-color: rgba(0, 0, 0, 0.08);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    }
+
+    .detail-card-title {
+        font-size: 1.15rem;
+        font-weight: 750;
+        margin: 0 0 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    [data-theme="light"] .detail-card-title {
+        border-bottom-color: rgba(0, 0, 0, 0.07);
+    }
+
+    /* ITENS DO PEDIDO */
+    .order-item-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.85rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    [data-theme="light"] .order-item-row {
+        border-bottom-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .order-item-row:last-child {
+        border-bottom: none;
+    }
+
+    .item-media {
+        width: 64px;
+        height: 64px;
+        border-radius: 12px;
+        object-fit: cover;
+        background: #2a2e31;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        flex-shrink: 0;
+    }
+
+    .item-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .item-name {
+        font-weight: 700;
+        font-size: 0.95rem;
+        margin: 0;
+        color: #fff;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    [data-theme="light"] .item-name {
+        color: #1a1d1e;
+    }
+
+    .item-sku {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.5);
+        margin: 0.15rem 0;
+    }
+
+    [data-theme="light"] .item-sku {
+        color: #6c757d;
+    }
+
+    .item-meta {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.75);
+    }
+
+    [data-theme="light"] .item-meta {
+        color: #495057;
+    }
+
+    .item-total {
+        font-weight: 750;
+        font-size: 1rem;
+        color: #f1e682;
+        text-align: right;
+        flex-shrink: 0;
+    }
+
+    [data-theme="light"] .item-total {
+        color: #c95d08;
+    }
+
+    /* HISTÓRICO DE AUDITORIA */
+    .audit-log-item {
+        position: relative;
+        padding-left: 1.5rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .audit-log-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 6px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #e67315;
+    }
+
+    .audit-log-item::after {
+        content: '';
+        position: absolute;
+        left: 4px;
+        top: 16px;
+        bottom: -12px;
+        width: 2px;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .audit-log-item:last-child::after {
+        display: none;
+    }
+
+    .audit-log-time {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.5);
+        margin: 0;
+    }
+
+    [data-theme="light"] .audit-log-time {
+        color: #6c757d;
+    }
+
+    .audit-log-action {
+        font-weight: 700;
+        font-size: 0.88rem;
+        margin: 0.15rem 0;
+    }
+
+    .audit-log-note {
+        font-size: 0.82rem;
+        color: rgba(255, 255, 255, 0.7);
+        margin: 0;
+    }
+
+    [data-theme="light"] .audit-log-note {
+        color: #495057;
+    }
+
+    /* RESUMO FINANCEIRO */
+    .summary-line {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.4rem 0;
+        font-size: 0.92rem;
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    [data-theme="light"] .summary-line {
+        color: #495057;
+    }
+
+    .summary-total {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+        border-top: 2px solid rgba(255, 255, 255, 0.1);
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #f1e682;
+    }
+
+    [data-theme="light"] .summary-total {
+        border-top-color: rgba(0, 0, 0, 0.1);
+        color: #e67315;
+    }
+
+    /* PAINEL OPERACIONAL STAFF */
+    .staff-control-panel {
+        background: linear-gradient(135deg, #1e242c 0%, #171a1f 100%);
+        border: 1px solid rgba(230, 115, 21, 0.4);
+        border-radius: 16px;
+        padding: 1.25rem 1.5rem;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    [data-theme="light"] .staff-control-panel {
+        background: #f8fafc;
+        border-color: rgba(230, 115, 21, 0.5);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    }
+
+    [data-theme="light"] .staff-control-panel select {
+        background: #ffffff !important;
+        color: #1e293b !important;
+        border-color: #cbd5e1 !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="tracking-page">
+    <div class="tracking-top-bar">
+        <div class="tracking-headline">
+            <h1>
+                <i class="fas fa-route text-warning" aria-hidden="true"></i>
+                Rastreio de Pedido {{ pedido.codigo_pedido }}
+            </h1>
+            <p>
+                <i class="far fa-clock me-1"></i> Realizado em {{ pedido.data_criacao|date:"d/m/Y às H:i" }}
+            </p>
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            {% if whatsapp_link_suporte %}
+                <a href="{{ whatsapp_link_suporte }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-success">
+                    <i class="fab fa-whatsapp me-1"></i> Suporte WhatsApp
+                </a>
+            {% endif %}
+            <a href="{% url 'meus_pedidos' %}" class="btn btn-outline-warning">
+                <i class="fas fa-arrow-left me-1"></i> Voltar aos Pedidos
+            </a>
+        </div>
+    </div>
+
+    {% if request.user.is_staff %}
+    <!-- BARRA OPERACIONAL DO STAFF / ADMIN -->
+    <div class="staff-control-panel mb-4">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-danger text-uppercase px-2 py-1">Operações Staff</span>
+                <span class="fw-bold small text-light">Gestão de Despacho & Notificações</span>
+            </div>
+            {% if whatsapp_link_cliente %}
+                <a href="{{ whatsapp_link_cliente }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-success fw-bold">
+                    <i class="fab fa-whatsapp me-1"></i> WhatsApp do Cliente
+                </a>
+            {% endif %}
+        </div>
+        
+        <form method="POST" action="{% url 'alterar_status_pedido_staff' pedido.id %}" class="mt-3 d-flex align-items-center flex-wrap gap-2">
+            {% csrf_token %}
+            <label for="id_novo_status" class="small text-muted me-1 mb-0">Alterar Estado:</label>
+            <select name="novo_status" id="id_novo_status" class="form-select form-select-sm" style="max-width: 260px; background: #2a2e33; color: #fff; border-color: rgba(255,255,255,0.15);">
+                {% for code, label in status_choices %}
+                    <option value="{{ code }}" {% if code == pedido.status %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-sm btn-warning fw-bold">
+                <i class="fas fa-check-circle me-1"></i> Atualizar Estado
+            </button>
+            <span class="text-muted small ms-auto d-none d-md-inline">
+                <i class="fas fa-paper-plane me-1"></i> Envia notificação por e-mail automaticamente
+            </span>
+        </form>
+    </div>
+    {% endif %}
+
+    <!-- CARD DA TIMELINE PROGRESSIVA -->
+    <section class="timeline-card" aria-label="Progresso do pedido">
+        <div class="timeline-status-header">
+            <div>
+                <span class="text-muted small text-uppercase fw-bold letter-spacing-1">Estado Atual</span>
+                <div class="mt-1">
+                    <span class="status-pill {{ pedido.badge_status.classe }}">
+                        <i class="{{ pedido.badge_status.icone }}" aria-hidden="true"></i>
+                        {{ pedido.badge_status.label }}
+                    </span>
+                </div>
+            </div>
+
+            {% if pedido.is_interrompido %}
+                <div class="alert alert-danger mb-0 py-2 px-3 small">
+                    <i class="fas fa-triangle-exclamation me-1"></i>
+                    Este pedido foi <strong>{{ pedido.get_status_display|lower }}</strong>. Entre em contato com o suporte em caso de dúvidas.
+                </div>
+            {% else %}
+                <div class="text-md-end">
+                    <span class="text-muted small">Previsão estimada</span>
+                    <p class="mb-0 fw-bold text-warning">1 a 3 dias úteis para Luanda e províncias</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- TRACKER VISUAL DAS 5 ETAPAS -->
+        <div class="stepper-wrapper" style="--progresso-mobile: {{ pedido.percentual_progresso }}%;">
+            <div class="stepper-progress-track">
+                <div class="stepper-progress-fill" style="width: {{ pedido.percentual_progresso }}%;"></div>
+            </div>
+
+            {% for etapa in etapas %}
+                <div class="stepper-item {{ etapa.estado }}">
+                    <div class="step-circle" title="{{ etapa.titulo }}">
+                        {% if etapa.estado == 'completed' %}
+                            <i class="fas fa-check" aria-hidden="true"></i>
+                        {% else %}
+                            <i class="{{ etapa.icone }}" aria-hidden="true"></i>
+                        {% endif %}
+                    </div>
+                    <div class="step-label">{{ etapa.titulo }}</div>
+                    <div class="step-subtext">{{ etapa.descricao }}</div>
+                    {% if etapa.data_hora %}
+                        <span class="step-timestamp">
+                            {{ etapa.data_hora|date:"d/m H:i" }}
+                        </span>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- GRID INFORMATIVO: ITENS, ENDEREÇO, PAGAMENTO E HISTÓRICO -->
+    <div class="details-grid">
+        <!-- COLUNA DA ESQUERDA: ARTIGOS COMPRADOS E HISTÓRICO -->
+        <div>
+            <!-- Artigos do Pedido -->
+            <section class="detail-card">
+                <h2 class="detail-card-title">
+                    <i class="fas fa-basket-shopping text-warning" aria-hidden="true"></i>
+                    Artigos Comprados ({{ pedido.itens.count }})
+                </h2>
+
+                <div class="order-items-list">
+                    {% for item in pedido.itens.all %}
+                        <div class="order-item-row">
+                            {% if item.produto.thumbnail %}
+                                <img src="{{ item.produto.thumbnail.url }}" alt="{{ item.produto.nome }}" class="item-media">
+                            {% elif item.produto.imagem %}
+                                <img src="{{ item.produto.imagem.url }}" alt="{{ item.produto.nome }}" class="item-media">
+                            {% else %}
+                                <div class="item-media d-flex align-items-center justify-content-center text-muted">
+                                    <i class="fas fa-cube fa-lg"></i>
+                                </div>
+                            {% endif %}
+
+                            <div class="item-info">
+                                <h3 class="item-name">{{ item.produto.nome }}</h3>
+                                <p class="item-sku">SKU: {{ item.produto.sku }}</p>
+                                <p class="item-meta mb-0">
+                                    Qtd: <strong>{{ item.quantidade }}</strong> × {{ item.preco_unitario|floatformat:2 }} Kz
+                                </p>
+                            </div>
+
+                            <div class="item-total">
+                                {{ item.subtotal|floatformat:2 }} Kz
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Histórico de Eventos de Status -->
+            <section class="detail-card">
+                <h2 class="detail-card-title">
+                    <i class="fas fa-clock-rotate-left text-warning" aria-hidden="true"></i>
+                    Histórico de Eventos do Pedido
+                </h2>
+
+                <div class="audit-log-list">
+                    {% for evento in historico %}
+                        <div class="audit-log-item">
+                            <p class="audit-log-time">{{ evento.criado_em|date:"d/m/Y às H:i" }}</p>
+                            <p class="audit-log-action">
+                                Status: <span class="badge bg-secondary">{{ evento.status_novo }}</span>
+                                {% if evento.usuario %}
+                                    <span class="text-muted small">por {{ evento.usuario.get_full_name|default:evento.usuario.username }}</span>
+                                {% endif %}
+                            </p>
+                            {% if evento.observacao %}
+                                <p class="audit-log-note">{{ evento.observacao }}</p>
+                            {% endif %}
+                        </div>
+                    {% empty %}
+                        <p class="text-muted small mb-0">Nenhum evento registrado até o momento.</p>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+
+        <!-- COLUNA DA DIREITA: ENDEREÇO, PAGAMENTO E RESUMO FINANCEIRO -->
+        <div>
+            <!-- Resumo Financeiro -->
+            <section class="detail-card">
+                <h2 class="detail-card-title">
+                    <i class="fas fa-receipt text-warning" aria-hidden="true"></i>
+                    Resumo de Valores
+                </h2>
+
+                <div class="summary-line">
+                    <span>Subtotal</span>
+                    <span>{{ pedido.subtotal|floatformat:2 }} Kz</span>
+                </div>
+                <div class="summary-line">
+                    <span>Taxa de Frete</span>
+                    {% if pedido.frete == 0 %}
+                        <span class="text-success fw-bold">Grátis</span>
+                    {% else %}
+                        <span>{{ pedido.frete|floatformat:2 }} Kz</span>
+                    {% endif %}
+                </div>
+                <div class="summary-total">
+                    <span>Total Pago</span>
+                    <span>{{ pedido.total|floatformat:2 }} Kz</span>
+                </div>
+            </section>
+
+            <!-- Endereço de Entrega -->
+            <section class="detail-card">
+                <h2 class="detail-card-title">
+                    <i class="fas fa-location-dot text-warning" aria-hidden="true"></i>
+                    Dados de Entrega
+                </h2>
+
+                <p class="mb-1 fw-bold">{{ pedido.usuario.get_full_name|default:pedido.usuario.username }}</p>
+                {% if perfil %}
+                    {% if perfil.bairro or perfil.municipio or perfil.provincia %}
+                        <p class="mb-1 text-muted small">
+                            {{ perfil.bairro|default:"" }}{% if perfil.bairro and perfil.municipio %}, {% endif %}
+                            {{ perfil.municipio|default:"" }}{% if perfil.municipio and perfil.provincia %} - {% endif %}
+                            {{ perfil.provincia|default:"" }}
+                        </p>
+                    {% else %}
+                        <p class="mb-1 text-muted small">Endereço padrão registrado na conta.</p>
+                    {% endif %}
+                    {% if perfil.telefone %}
+                        <p class="mb-0 text-muted small">
+                            <i class="fas fa-phone me-1"></i> {{ perfil.telefone }}
+                        </p>
+                    {% endif %}
+                {% else %}
+                    <p class="mb-0 text-muted small">Informações de entrega padrão associadas à conta.</p>
+                {% endif %}
+            </section>
+
+            <!-- Informações de Pagamento -->
+            <section class="detail-card">
+                <h2 class="detail-card-title">
+                    <i class="fas fa-credit-card text-warning" aria-hidden="true"></i>
+                    Pagamento
+                </h2>
+
+                {% if pagamento %}
+                    <div class="summary-line">
+                        <span>Método</span>
+                        <span class="fw-bold">{{ pagamento.provider|title }}</span>
+                    </div>
+                    <div class="summary-line">
+                        <span>Estado</span>
+                        <span class="badge bg-success">{{ pagamento.get_status_display }}</span>
+                    </div>
+                    <div class="summary-line">
+                        <span>Data Liquidação</span>
+                        <span>{{ pagamento.criado_em|date:"d/m/Y H:i" }}</span>
+                    </div>
+                {% else %}
+                    <p class="text-muted small mb-0">Informações de pagamento em processamento.</p>
+                {% endif %}
+            </section>
+        </div>
+    </div>
+</div>
+{% endblock %}

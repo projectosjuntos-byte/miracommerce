@@ -1,0 +1,30 @@
+# Nunca inclua segredos, bases locais ou artefactos de desenvolvimento na imagem.
+.env
+.env.*
+!.env.example
+deploy/.env.production
+
+.git
+.github
+.vscode
+.codex
+.agents
+.venv
+.venv-*
+__pycache__/
+*.py[cod]
+*.sqlite3
+celerybeat-schedule*
+
+# Estes dados são montados ou gerados em tempo de execução.
+media/
+staticfiles/
+archive/
+loadtests/
+img/
+
+# Resultados e ficheiros locais desnecessários na imagem de produção.
+.coverage
+htmlcov/
+.pytest_cache/
+*.log

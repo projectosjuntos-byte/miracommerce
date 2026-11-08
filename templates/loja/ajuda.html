@@ -1,0 +1,192 @@
+{% extends "loja/base.html" %}
+
+{% block title %}Ajuda e Suporte - MiraComerce IA{% endblock %}
+
+{% block extra_css %}
+<style nonce="{{ request.csp_nonce }}">
+    body { 
+        background: linear-gradient(135deg, #e67315 0%, #f1e682 100%); 
+        background-attachment: fixed;
+        min-height: 100vh;
+    }
+
+    /* Painel Central com Efeito Glassmorphism */
+    .help-panel {
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border-radius: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+        padding: 3.5rem 2rem;
+    }
+
+    /* Estilização do Accordion */
+    .accordion-item {
+        background: rgba(255, 255, 255, 0.6) !important;
+        border-radius: 15px !important;
+        margin-bottom: 1.2rem;
+        border: 1px solid rgba(230, 115, 21, 0.15) !important;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+
+    .accordion-item:hover {
+        transform: translateY(-2px);
+        border-color: var(--primary-orange) !important;
+    }
+
+    .accordion-button {
+        background: transparent !important;
+        color: #2d3436 !important;
+        box-shadow: none !important;
+        padding: 1.2rem;
+    }
+
+    .accordion-button:not(.collapsed) {
+        color: #e67315 !important;
+        background: rgba(230, 115, 21, 0.05) !important;
+    }
+
+    /* Seta Laranja */
+    .accordion-button::after {
+        filter: sepia(100%) saturate(1000%) hue-rotate(340deg);
+    }
+
+    .faq-icon {
+        color: #e67315;
+        margin-right: 15px;
+        width: 20px;
+        text-align: center;
+    }
+
+    /* Card de Contato Final (Contraste Dark) */
+    .contact-card {
+        background: #1a1d1e !important; 
+        border-radius: 25px;
+        border: none;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .contact-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 150px;
+        height: 150px;
+        background: rgba(230, 115, 21, 0.1);
+        border-radius: 50%;
+    }
+
+    .btn-whatsapp {
+        background: #e67315;
+        border: none;
+        color: white;
+        padding: 12px 30px;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .btn-whatsapp:hover {
+        background: #f1e682;
+        color: #1a1d1e;
+        transform: scale(1.08);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+
+    .btn-back {
+        transition: all 0.3s ease;
+        border: 1.5px solid #1a1d1e;
+    }
+
+    .btn-back:hover {
+        background: #1a1d1e;
+        color: white;
+        transform: translateX(-5px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-9 animate__animated animate__fadeInUp">
+            <div class="help-panel">
+                
+                <div class="text-center mb-5">
+                    <div class="d-inline-block p-4 rounded-circle bg-dark mb-4 shadow-lg">
+                        <i class="fas fa-headset fa-3x" style="color: #f1e682;"></i>
+                    </div>
+                    <h1 class="fw-bold display-6" style="color: #1a1d1e;">Como podemos ajudar?</h1>
+                    <p class="lead text-muted">Suporte inteligente para a sua melhor experiência na MiraComerce.</p>
+                </div>
+
+                <div class="accordion" id="faqEcommerce">
+                    
+                    <div class="accordion-item shadow-sm">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                                <i class="fas fa-robot faq-icon"></i> Como funciona a Inteligência Artificial?
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#faqEcommerce">
+                            <div class="accordion-body text-muted">
+                                Nossa plataforma utiliza o algoritmo <span class="fw-bold" style="color: #e67315;">Apriori</span> para analisar o seu comportamento de compra e sugerir produtos que realmente combinam com o seu cesto. Além disso, ajudamos a gerência a evitar ruturas de stock com modelos preditivos.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item shadow-sm">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                                <i class="fas fa-truck-fast faq-icon"></i> Qual o prazo de entrega em Luanda?
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#faqEcommerce">
+                            <div class="accordion-body text-muted">
+                                Para a zona de Luanda e Viana, o prazo padrão é de <span class="fw-bold" style="color: #e67315;">24h úteis</span>. Pedidos confirmados até às 10h podem ser entregues no mesmo dia, dependendo da disponibilidade logística.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item shadow-sm">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                                <i class="fas fa-shield-halved faq-icon"></i> Meus dados estão seguros?
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#faqEcommerce">
+                            <div class="accordion-body text-muted">
+                                Sim. Utilizamos criptografia SSL em todas as transações. Seus dados de pagamento são processados por gateways seguros e nunca ficam armazenados diretamente em nosso banco de dados.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="contact-card mt-5 p-4 shadow-lg">
+                    <div class="row align-items-center">
+                        <div class="col-md-8 text-center text-md-start">
+                            <h4 class="fw-bold text-white mb-2">Precisa de suporte humano?</h4>
+                            <p class="mb-0 text-white-50">Nossa equipa técnica em Luanda está pronta para atender você agora.</p>
+                        </div>
+                        <div class="col-md-4 text-center text-md-end mt-4 mt-md-0">
+                            <a href="https://wa.me/244900000000" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp rounded-pill fw-bold">
+                                <i class="fab fa-whatsapp me-2"></i>Falar Agora
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-5">
+                    <a href="{% url 'home' %}" class="btn btn-back rounded-pill px-5 py-2 fw-bold">
+                        <i class="fas fa-house me-2"></i> Voltar à Vitrine
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

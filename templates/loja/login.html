@@ -1,0 +1,64 @@
+{% extends "loja/base.html" %}
+{% load static %}
+
+{% block title %}Entrar - MiraComerce{% endblock %}
+
+{% block content %}
+<section class="auth-page" aria-labelledby="loginTitle">
+    <div class="auth-wrap">
+        <div class="auth-layout">
+            <aside class="auth-story">
+                <a class="auth-brand" href="{% url 'home' %}" aria-label="Voltar à página inicial">
+                    <img src="{% static 'logo-mira.png' %}" alt="MiraComerce">
+                </a>
+                <div class="auth-story-copy">
+                    <h2>As suas compras, sempre por perto.</h2>
+                    <p>Entre para rever pedidos, guardar produtos e concluir a sua compra com mais rapidez.</p>
+                </div>
+                <div class="auth-story-photo">
+                    <img src="{% static 'loja/img/auth-login-compras.jpg' %}" alt="Cliente a escolher produtos frescos no supermercado">
+                </div>
+                <div class="auth-story-list" aria-label="Benefícios da conta">
+                    <div class="auth-story-item"><i class="fas fa-bag-shopping" aria-hidden="true"></i><span>O seu carrinho fica pronto para continuar.</span></div>
+                    <div class="auth-story-item"><i class="fas fa-shield-halved" aria-hidden="true"></i><span>Dados e pedidos protegidos na sua conta.</span></div>
+                </div>
+                <a class="auth-back-link" href="{% url 'home' %}"><i class="fas fa-arrow-left" aria-hidden="true"></i>Voltar à vitrine</a>
+            </aside>
+
+            <div class="auth-panel">
+                <div class="auth-panel-inner">
+                    <p class="auth-kicker">Aceder à conta</p>
+                    <h1 id="loginTitle" class="auth-heading">Bom ter você de volta.</h1>
+                    <p class="auth-intro">Informe os seus dados para continuar onde parou.</p>
+
+                    {% if form.non_field_errors %}
+                    <div class="auth-alert" role="alert">{{ form.non_field_errors }}</div>
+                    {% endif %}
+
+                    <form method="post" class="auth-form">
+                        {% csrf_token %}
+                        {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+                        <div class="auth-field">
+                            <label for="id_username">Utilizador ou e-mail</label>
+                            <input type="text" name="username" id="id_username" value="{{ form.username.value|default_if_none:'' }}" autocomplete="username" placeholder="nome de utilizador ou e-mail" required{% if form.username.errors %} class="is-invalid" aria-describedby="username-error"{% endif %}>
+                            {% for error in form.username.errors %}<p id="username-error" class="auth-field-error">{{ error }}</p>{% endfor %}
+                        </div>
+                        <div class="auth-field">
+                            <label for="id_password">Senha</label>
+                            <input type="password" name="password" id="id_password" autocomplete="current-password" required{% if form.password.errors %} class="is-invalid" aria-describedby="password-error"{% endif %}>
+                            {% for error in form.password.errors %}<p id="password-error" class="auth-field-error">{{ error }}</p>{% endfor %}
+                        </div>
+                        <button type="submit" class="auth-submit">Entrar na minha conta <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+                    </form>
+
+                    <div class="auth-meta">
+                        <span>Esqueceu a senha? <a href="{% url 'password_reset' %}">Recuperar acesso</a></span>
+                        <span>Ainda não tem conta? <a href="{% url 'cadastro' %}">Criar conta</a></span>
+                        <span>Precisa de ajuda? <a href="{% url 'faq' %}">Ver FAQ</a></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

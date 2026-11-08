@@ -1,0 +1,416 @@
+{% extends "loja/base.html" %}
+{% load static %}
+
+{% block title %}Definições - MiraComerce{% endblock %}
+
+{% block extra_css %}
+<style nonce="{{ request.csp_nonce }}">
+    .settings-page {
+        max-width: 1040px;
+    }
+
+    .settings-header {
+        border-bottom: 1px solid rgba(26, 29, 30, .12);
+        padding-bottom: 1.5rem;
+    }
+
+    .settings-header-icon {
+        width: 52px;
+        height: 52px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 15px;
+        background: #1a1d1e;
+        color: #f1e682;
+        font-size: 1.2rem;
+    }
+
+    .settings-section {
+        background: #fff;
+        border: 1px solid rgba(26, 29, 30, .09);
+        border-radius: 20px;
+        box-shadow: 0 10px 24px rgba(26, 29, 30, .05);
+    }
+
+    .settings-link {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        color: #1a1d1e;
+        text-decoration: none;
+        border: 1px solid rgba(26, 29, 30, .08);
+        border-radius: 14px;
+        padding: 1rem;
+        transition: transform .2s ease, border-color .2s ease, background-color .2s ease;
+    }
+
+    .settings-link:hover {
+        color: #1a1d1e;
+        border-color: #e67315;
+        background: rgba(241, 230, 130, .14);
+        transform: translateY(-2px);
+    }
+
+    .settings-link:focus-visible {
+        outline: 3px solid rgba(230, 115, 21, .4);
+        outline-offset: 2px;
+    }
+
+    .settings-link-icon {
+        width: 42px;
+        height: 42px;
+        flex: 0 0 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: rgba(230, 115, 21, .12);
+        color: #c35f0f;
+    }
+
+    .settings-link-arrow {
+        margin-left: auto;
+        color: #c35f0f;
+    }
+
+    .settings-form .form-label {
+        color: #1a1d1e;
+        font-weight: 700;
+    }
+
+    .settings-form .form-control,
+    .settings-form .form-select {
+        border-color: rgba(26, 29, 30, .16);
+        min-height: 46px;
+    }
+
+    .settings-form .form-control:focus,
+    .settings-form .form-select:focus {
+        border-color: #e67315;
+        box-shadow: 0 0 0 .2rem rgba(230, 115, 21, .16);
+    }
+
+    .settings-danger {
+        border: 1px solid rgba(220, 53, 69, .2);
+        border-radius: 16px;
+        background: rgba(220, 53, 69, .04);
+    }
+
+    .settings-capabilities {
+        border: 1px solid rgba(230, 115, 21, .18);
+        border-radius: 16px;
+        background: rgba(241, 230, 130, .12);
+    }
+
+    .settings-capability {
+        display: flex;
+        align-items: flex-start;
+        gap: .65rem;
+        color: #51565a;
+        line-height: 1.45;
+    }
+
+    .settings-capability i {
+        color: #c35f0f;
+        margin-top: .15rem;
+    }
+
+    /* Sistema visual da vitrine aplicado à área de conta. */
+    .settings-page {
+        max-width: 960px;
+        padding-top: 4.5rem !important;
+        padding-bottom: 5rem !important;
+    }
+
+    .settings-page .text-muted {
+        color: var(--mira-muted) !important;
+    }
+
+    .settings-header {
+        padding: 0 0 1.75rem;
+        border-color: var(--mira-line);
+    }
+
+    .settings-header h1,
+    .settings-section h2 {
+        color: var(--mira-paper);
+        letter-spacing: -0.04em;
+    }
+
+    .settings-header-icon {
+        border-radius: 14px;
+        background: var(--mira-accent);
+        color: #1a1711;
+    }
+
+    .settings-section {
+        border-color: var(--mira-line);
+        border-radius: var(--mira-radius);
+        background: var(--mira-ink-raised);
+        box-shadow: none;
+    }
+
+    .settings-capabilities {
+        border-color: rgba(244, 122, 31, 0.28);
+        background: rgba(244, 122, 31, 0.08);
+    }
+
+    .settings-capability {
+        color: var(--mira-mist);
+    }
+
+    .settings-capability i,
+    .settings-link-icon,
+    .settings-link-arrow {
+        color: var(--mira-accent);
+    }
+
+    .settings-link {
+        border-color: var(--mira-line);
+        border-radius: 14px;
+        background: var(--mira-ink-soft);
+        color: var(--mira-paper);
+    }
+
+    .settings-link:hover,
+    .settings-link:focus-visible {
+        border-color: rgba(244, 122, 31, 0.7);
+        background: rgba(244, 122, 31, 0.09);
+        color: var(--mira-paper);
+        transform: translateY(-2px);
+    }
+
+    .settings-link-icon {
+        border-radius: 11px;
+        background: rgba(244, 122, 31, 0.11);
+    }
+
+    .settings-form .form-label {
+        color: var(--mira-paper);
+    }
+
+    .settings-form .form-control,
+    .settings-form .form-select {
+        border-color: rgba(237, 241, 231, 0.26);
+        border-radius: 10px;
+        background: #edf1e7;
+        color: #182018;
+    }
+
+    .settings-form .form-control:focus,
+    .settings-form .form-select:focus {
+        border-color: var(--mira-accent);
+        box-shadow: 0 0 0 .2rem rgba(244, 122, 31, 0.2);
+    }
+
+    .settings-danger {
+        border-color: rgba(220, 80, 69, 0.46);
+        background: rgba(220, 80, 69, 0.08);
+    }
+
+    .settings-page .btn-dark,
+    .settings-page .btn-outline-dark,
+    .settings-page .btn-outline-warning {
+        border-radius: 10px;
+        font-weight: 750;
+    }
+
+    .settings-page .btn-dark {
+        border-color: var(--mira-accent);
+        background: var(--mira-accent);
+        color: #1a1711;
+    }
+
+    .settings-page .btn-dark:hover,
+    .settings-page .btn-dark:focus-visible {
+        border-color: #ff9a4b;
+        background: #ff9a4b;
+        color: #1a1711;
+    }
+
+    .settings-page .btn-outline-dark,
+    .settings-page .btn-outline-warning {
+        border-color: rgba(237, 241, 231, 0.38);
+        color: var(--mira-paper);
+    }
+
+    .settings-page .btn-outline-dark:hover,
+    .settings-page .btn-outline-warning:hover {
+        border-color: var(--mira-accent);
+        background: rgba(244, 122, 31, 0.12);
+        color: var(--mira-paper);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .settings-link { transition: none; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container settings-page py-5">
+    <header class="settings-header mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <div class="settings-header-icon" aria-hidden="true"><i class="fas fa-sliders"></i></div>
+            <div>
+                <p class="text-uppercase small fw-bold text-muted mb-1">Conta e informação</p>
+                <h1 class="h2 fw-bold mb-1">Definições</h1>
+                <p class="text-muted mb-0">Aceda às informações da sua conta e aos documentos da MiraComerce.</p>
+            </div>
+        </div>
+    </header>
+
+    <section class="settings-section p-4 p-md-5 mb-4" aria-labelledby="opcoesTitulo">
+        <h2 id="opcoesTitulo" class="h4 fw-bold mb-2">Configurações disponíveis nesta página</h2>
+        <p class="text-muted mb-4">As opções abaixo ficam disponíveis depois de entrar na sua conta.</p>
+        <div class="settings-capabilities p-3 p-md-4">
+            <div class="row g-2 small">
+                <div class="col-md-6"><div class="settings-capability"><i class="fas fa-check" aria-hidden="true"></i><span>Alteração de idioma entre Português e English.</span></div></div>
+                <div class="col-md-6"><div class="settings-capability"><i class="fas fa-check" aria-hidden="true"></i><span>Edição de nome e sobrenome.</span></div></div>
+                <div class="col-md-6"><div class="settings-capability"><i class="fas fa-check" aria-hidden="true"></i><span>Edição de e-mail.</span></div></div>
+                <div class="col-md-6"><div class="settings-capability"><i class="fas fa-check" aria-hidden="true"></i><span>Edição de telefone.</span></div></div>
+                <div class="col-md-6"><div class="settings-capability"><i class="fas fa-check" aria-hidden="true"></i><span>Edição de província, município e bairro.</span></div></div>
+                <div class="col-md-6"><div class="settings-capability"><i class="fas fa-check" aria-hidden="true"></i><span>Sair apenas da sessão atual.</span></div></div>
+                <div class="col-md-6"><div class="settings-capability"><i class="fas fa-check" aria-hidden="true"></i><span>Encerrar o acesso à conta, mantendo os dados.</span></div></div>
+                <div class="col-md-6"><div class="settings-capability"><i class="fas fa-check" aria-hidden="true"></i><span>Excluir dados pessoais e anonimizar a conta.</span></div></div>
+            </div>
+        </div>
+        {% if not user.is_authenticated %}
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mt-4">
+            <p class="text-muted mb-0">Entre na sua conta para editar os dados e gerir o acesso.</p>
+            <a class="btn btn-dark rounded-pill px-4" href="{% url 'login' %}?next={% url 'definicoes' %}"><i class="fas fa-right-to-bracket me-2" aria-hidden="true"></i>Entrar para continuar</a>
+        </div>
+        {% endif %}
+    </section>
+
+    {% if user.is_authenticated %}
+    <section class="settings-section p-4 p-md-5 mb-4" aria-labelledby="contaTitulo">
+        <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
+            <div>
+                <h2 id="contaTitulo" class="h4 fw-bold mb-2">Dados da conta</h2>
+                <p class="text-muted mb-0">Atualize os seus dados de contacto e escolha o idioma da interface.</p>
+            </div>
+            <i class="fas fa-user-pen text-warning fs-4" aria-hidden="true"></i>
+        </div>
+
+        <form class="settings-form" method="post" action="{% url 'atualizar_definicoes' %}">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
+                    {{ form.first_name }}
+                    {{ form.first_name.errors }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
+                    {{ form.last_name }}
+                    {{ form.last_name.errors }}
+                </div>
+                <div class="col-md-8">
+                    <label class="form-label" for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                    {{ form.email }}
+                    {{ form.email.errors }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="{{ form.idioma.id_for_label }}">{{ form.idioma.label }}</label>
+                    {{ form.idioma }}
+                    {{ form.idioma.errors }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ form.telefone.id_for_label }}">{{ form.telefone.label }}</label>
+                    {{ form.telefone }}
+                    {{ form.telefone.errors }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ form.provincia.id_for_label }}">{{ form.provincia.label }}</label>
+                    {{ form.provincia }}
+                    {{ form.provincia.errors }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ form.municipio.id_for_label }}">{{ form.municipio.label }}</label>
+                    {{ form.municipio }}
+                    {{ form.municipio.errors }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ form.bairro.id_for_label }}">{{ form.bairro.label }}</label>
+                    {{ form.bairro }}
+                    {{ form.bairro.errors }}
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end mt-4">
+                <button class="btn btn-dark rounded-pill px-4" type="submit"><i class="fas fa-floppy-disk me-2" aria-hidden="true"></i>Guardar alterações</button>
+            </div>
+        </form>
+    </section>
+    {% endif %}
+
+    <section class="settings-section p-4 p-md-5 mb-4" aria-labelledby="documentosTitulo">
+        <h2 id="documentosTitulo" class="h4 fw-bold mb-2">Documentos e políticas</h2>
+        <p class="text-muted mb-4">Consulte as regras que orientam o tratamento dos seus dados e as solicitações de devolução.</p>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <a class="settings-link h-100" href="{% url 'definicoes_privacidade' %}">
+                    <span class="settings-link-icon" aria-hidden="true"><i class="fas fa-shield-halved"></i></span>
+                    <span>
+                        <strong class="d-block">Política de privacidade</strong>
+                        <small class="text-muted">Dados tratados, retenção, exportação e anonimização.</small>
+                    </span>
+                    <i class="fas fa-chevron-right settings-link-arrow" aria-hidden="true"></i>
+                </a>
+            </div>
+            <div class="col-md-6">
+                <a class="settings-link h-100" href="{% url 'politica_devolucao' %}">
+                    <span class="settings-link-icon" aria-hidden="true"><i class="fas fa-box-open"></i></span>
+                    <span>
+                        <strong class="d-block">Política de devolução</strong>
+                        <small class="text-muted">Condições, análise da solicitação e próximos passos.</small>
+                    </span>
+                    <i class="fas fa-chevron-right settings-link-arrow" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="settings-section p-4 p-md-5" aria-labelledby="atalhosTitulo">
+        <h2 id="atalhosTitulo" class="h4 fw-bold mb-2">Atalhos</h2>
+        <p class="text-muted mb-4">Encontre rapidamente o que precisa.</p>
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-dark rounded-pill px-4" href="{% url 'faq' %}"><i class="fas fa-circle-question me-2" aria-hidden="true"></i>Ver FAQ</a>
+            <a class="btn btn-outline-dark rounded-pill px-4" href="{% url 'home' %}"><i class="fas fa-house me-2" aria-hidden="true"></i>Voltar à loja</a>
+        </div>
+    </section>
+
+    {% if user.is_authenticated %}
+    <section class="settings-section settings-danger p-4 p-md-5 mt-4" aria-labelledby="acessoTitulo">
+        <h2 id="acessoTitulo" class="h4 fw-bold mb-2">Acesso à conta</h2>
+        <p class="text-muted mb-4">Escolha entre terminar apenas a sessão atual, encerrar o acesso à conta ou remover os dados pessoais.</p>
+
+        <div class="d-flex flex-wrap gap-2">
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button class="btn btn-outline-dark rounded-pill px-4" type="submit"><i class="fas fa-right-from-bracket me-2" aria-hidden="true"></i>Sair desta sessão</button>
+            </form>
+            {% if not user.is_staff %}
+            <form method="post" action="{% url 'desativar_conta' %}" data-confirm-deactivate>
+                {% csrf_token %}
+                <button class="btn btn-outline-warning rounded-pill px-4" type="submit"><i class="fas fa-user-lock me-2" aria-hidden="true"></i>Encerrar acesso</button>
+            </form>
+            <form method="post" action="{% url 'excluir_dados' %}" data-confirm-delete>
+                {% csrf_token %}
+                <button class="btn btn-outline-danger rounded-pill px-4" type="submit"><i class="fas fa-user-xmark me-2" aria-hidden="true"></i>Excluir dados e conta</button>
+            </form>
+            {% endif %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}<script src="{% static 'loja/js/privacy.js' %}" defer></script>{% endblock %}

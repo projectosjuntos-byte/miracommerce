@@ -1,0 +1,87 @@
+{% extends "loja/base.html" %}
+
+{% block title %}Política de devolução - MiraComerce{% endblock %}
+
+{% block extra_css %}
+<style nonce="{{ request.csp_nonce }}">
+    .policy-page {
+        max-width: 920px;
+    }
+
+    .policy-card {
+        background: #fff;
+        border: 1px solid rgba(26, 29, 30, .09);
+        border-radius: 22px;
+        box-shadow: 0 12px 28px rgba(26, 29, 30, .06);
+    }
+
+    .policy-card h2 {
+        color: #1a1d1e;
+        font-size: 1.2rem;
+        font-weight: 800;
+        margin-top: 2rem;
+    }
+
+    .policy-card h2:first-of-type {
+        margin-top: 0;
+    }
+
+    .policy-card p,
+    .policy-card li {
+        color: #51565a;
+        line-height: 1.75;
+    }
+
+    .policy-card li + li {
+        margin-top: .6rem;
+    }
+
+    .policy-link {
+        color: #b8560c;
+        font-weight: 700;
+    }
+
+    .policy-link:focus-visible,
+    .policy-card .btn:focus-visible {
+        outline: 3px solid rgba(230, 115, 21, .4);
+        outline-offset: 2px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container policy-page py-5">
+    <article class="policy-card p-4 p-md-5">
+        <p class="text-uppercase small fw-bold text-muted mb-2">Definições e documentos</p>
+        <h1 class="h2 fw-bold mb-2">Política de devolução</h1>
+        <p class="text-muted mb-4">Última atualização: 2 de outubro de 2026</p>
+
+        <p>Esta página explica como solicitar a análise de uma devolução de produtos comprados na MiraComerce. A aprovação depende das condições do produto, dos dados do pedido e das regras aplicáveis à operação.</p>
+
+        <h2>Quando solicitar uma devolução</h2>
+        <p>Entre em contacto com o suporte assim que identificar uma das situações abaixo:</p>
+        <ul>
+            <li>Produto recebido com defeito, dano visível ou embalagem comprometida.</li>
+            <li>Produto diferente do que foi confirmado no pedido.</li>
+            <li>Item em desacordo com as condições apresentadas no momento da compra.</li>
+        </ul>
+
+        <h2>Dados necessários</h2>
+        <p>Para localizar o pedido e avaliar a solicitação, tenha disponível o número do pedido, o nome da conta, a descrição do problema e, quando possível, fotografias do produto e da embalagem.</p>
+
+        <h2>Análise e resultado</h2>
+        <p>A equipa poderá solicitar informações adicionais antes de concluir a análise. Se a devolução for aprovada, serão comunicados os passos para recolha ou entrega do produto e a forma de tratamento do reembolso ou substituição.</p>
+
+        <h2>Condições do produto</h2>
+        <p>Salvo quando o problema for defeito, dano ou erro de separação, o produto deve ser apresentado sem uso indevido e com os acessórios e elementos que o acompanham. Produtos perecíveis ou com risco sanitário podem exigir uma análise específica.</p>
+
+        <h2>Proteção de dados</h2>
+        <p>Os dados enviados para analisar a devolução são tratados apenas para localizar o pedido, avaliar a solicitação e cumprir obrigações de registo. Consulte a <a class="policy-link" href="{% url 'definicoes_privacidade' %}">Política de privacidade</a> para saber mais.</p>
+
+        <div class="d-flex flex-wrap gap-2 mt-5">
+            <a class="btn btn-dark rounded-pill px-4" href="{% url 'definicoes' %}"><i class="fas fa-arrow-left me-2" aria-hidden="true"></i>Voltar às definições</a>
+            <a class="btn btn-outline-dark rounded-pill px-4" href="{% url 'faq' %}">Consultar FAQ</a>
+        </div>
+    </article>
+</div>
+{% endblock %}

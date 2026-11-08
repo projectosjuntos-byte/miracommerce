@@ -1,0 +1,84 @@
+name: Django CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      DEBUG: "True"
+      DB_ENGINE: django.db.backends.mysql
+      DB_NAME: miracommerce_ci
+      DB_USER: root
+      DB_PASSWORD: rootpassword
+      DB_HOST: 127.0.0.1
+      DB_PORT: "3306"
+      USE_REDIS_CACHE: "False"
+      CELERY_TASK_ALWAYS_EAGER: "True"
+      RUN_CONCURRENCY_TESTS: "1"
+      SECRET_KEY: ci-only-secret-key-with-more-than-fifty-characters-for-validation
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: miracommerce_ci
+          MYSQL_ROOT_PASSWORD: rootpassword
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -prootpassword"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install native dependencies
+        run: sudo apt-get update && sudo apt-get install -y build-essential default-libmysqlclient-dev
+
+      - name: Install Python dependencies
+        run: python -m pip install -r requirements-dev.txt
+
+      - name: Validate project and clean database
+        run: |
+          python manage.py check
+          python manage.py migrate --noinput
+          python manage.py makemigrations --check
+          coverage run manage.py test --noinput
+          coverage report --fail-under=50
+          python -m compileall -q loja meu_ecommerce manage.py
+          python -m pip check
+          bash deploy/backup/test_backup.sh
+
+      - name: Lint and static analysis
+        run: |
+          ruff check loja meu_ecommerce manage.py
+          bandit -q -r loja meu_ecommerce -x loja/migrations,loja/tests.py
+
+      - name: Dependency vulnerability scan
+        run: pip-audit -r requirements.txt
+
+      - name: Production static build
+        env:
+          DEBUG: "False"
+          SECRET_KEY: ci-only-production-secret-key-with-more-than-fifty-characters
+          ALLOWED_HOSTS: localhost
+          CSRF_TRUSTED_ORIGINS: https://localhost
+          DB_ENGINE: django.db.backends.sqlite3
+          DB_NAME: ":memory:"
+          USE_REDIS_CACHE: "False"
+          EMAIL_HOST_USER: ci@example.invalid
+          EMAIL_HOST_PASSWORD: ci-only-password
+          REQUIRE_EXTERNAL_MEDIA_STORAGE: "False"
+          MEDIA_STORAGE_BACKEND: django.core.files.storage.FileSystemStorage
+        run: |
+          python manage.py check --deploy
+          python manage.py collectstatic --noinput

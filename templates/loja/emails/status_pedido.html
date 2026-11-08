@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ meta.titulo }} — {{ codigo_pedido }}</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; color: #1e293b;">
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f1f5f9; padding: 24px 12px;">
+        <tr>
+            <td align="center">
+                <!-- WRAPPER CENTRAL (MAX 600PX) -->
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06); border: 1px solid #e2e8f0;">
+                    
+                    <!-- 1. CABEÇALHO BRANDING -->
+                    <tr>
+                        <td style="background-color: #1a1d1e; padding: 28px 32px; border-bottom: 3px solid #e67315; text-align: left;">
+                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td>
+                                        <h1 style="margin: 0; color: #ffffff; font-size: 22px; font-weight: 800; letter-spacing: -0.02em;">
+                                            MiraComerce <span style="color: #e67315;">IA</span>
+                                        </h1>
+                                        <p style="margin: 4px 0 0; color: #94a3b8; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600;">
+                                            Notificação Oficial de Pedido
+                                        </p>
+                                    </td>
+                                    <td align="right">
+                                        <span style="display: inline-block; padding: 6px 12px; background-color: rgba(255, 255, 255, 0.1); border-radius: 999px; color: #f1e682; font-size: 13px; font-weight: 700;">
+                                            {{ codigo_pedido }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- 2. DESTAQUE DO NOVO STATUS -->
+                    <tr>
+                        <td style="padding: 32px 32px 20px;">
+                            <p style="margin: 0 0 12px; font-size: 15px; color: #64748b;">
+                                Olá, <strong style="color: #0f172a;">{{ pedido.usuario.get_full_name|default:pedido.usuario.username }}</strong>!
+                            </p>
+                            <h2 style="margin: 0 0 16px; font-size: 20px; font-weight: 800; color: #0f172a; line-height: 1.3;">
+                                {{ meta.titulo }}
+                            </h2>
+
+                            <!-- BADGE DO STATUS -->
+                            <div style="display: inline-block; margin-bottom: 20px; padding: 10px 18px; background-color: {{ meta.badge_bg }}; border: 1px solid {{ meta.badge_cor }}; border-radius: 999px; color: {{ meta.badge_cor }}; font-weight: 800; font-size: 14px;">
+                                <span style="font-size: 16px; margin-right: 6px;">{{ meta.icone }}</span> {{ meta.badge_label }}
+                            </div>
+
+                            <p style="margin: 0 0 18px; font-size: 15px; line-height: 1.6; color: #334155;">
+                                {{ meta.mensagem }}
+                            </p>
+
+                            <!-- CAIXA DE PRÓXIMO PASSO -->
+                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border-left: 4px solid #e67315; border-radius: 0 8px 8px 0; padding: 14px 16px; margin-bottom: 24px;">
+                                <tr>
+                                    <td>
+                                        <strong style="display: block; font-size: 12px; text-transform: uppercase; color: #e67315; margin-bottom: 4px; letter-spacing: 0.05em;">
+                                            Próxima Etapa
+                                        </strong>
+                                        <span style="font-size: 13.5px; color: #475569; line-height: 1.5;">
+                                            {{ meta.proximo_passo }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- BOTÃO CTA DE RASTREIO -->
+                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 28px;">
+                                <tr>
+                                    <td align="center">
+                                        <a href="{{ url_rastreio }}" target="_blank" style="display: inline-block; padding: 15px 32px; background-color: #e67315; color: #ffffff; text-decoration: none; border-radius: 10px; font-weight: 800; font-size: 15px; box-shadow: 0 4px 12px rgba(230, 115, 21, 0.35); text-align: center;">
+                                            Acompanhar Rastreio em Tempo Real &rarr;
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- 3. TIMELINE VISUAL DE ETAPAS -->
+                    <tr>
+                        <td style="padding: 0 32px 28px;">
+                            <h3 style="margin: 0 0 14px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; font-weight: 800; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">
+                                Evolução da Entrega
+                            </h3>
+                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size: 13px;">
+                                {% for etapa in etapas %}
+                                <tr>
+                                    <td width="30" valign="top" style="padding-bottom: 12px;">
+                                        {% if etapa.estado == 'completed' %}
+                                            <span style="display: inline-block; width: 22px; height: 22px; line-height: 22px; border-radius: 50%; background-color: #16a34a; color: #ffffff; text-align: center; font-size: 12px; font-weight: bold;">✓</span>
+                                        {% elif etapa.estado == 'current' %}
+                                            <span style="display: inline-block; width: 22px; height: 22px; line-height: 22px; border-radius: 50%; background-color: #e67315; color: #ffffff; text-align: center; font-size: 12px; font-weight: bold;">●</span>
+                                        {% else %}
+                                            <span style="display: inline-block; width: 22px; height: 22px; line-height: 22px; border-radius: 50%; background-color: #e2e8f0; color: #94a3b8; text-align: center; font-size: 12px;">○</span>
+                                        {% endif %}
+                                    </td>
+                                    <td valign="top" style="padding-bottom: 12px;">
+                                        <strong style="color: {% if etapa.estado == 'completed' %}#16a34a{% elif etapa.estado == 'current' %}#e67315{% else %}#94a3b8{% endif %};">
+                                            {{ etapa.titulo }}
+                                        </strong>
+                                        <div style="font-size: 12px; color: #64748b;">{{ etapa.descricao }}</div>
+                                    </td>
+                                    <td width="120" align="right" valign="top" style="padding-bottom: 12px; color: #94a3b8; font-size: 11.5px;">
+                                        {% if etapa.data_hora %}
+                                            {{ etapa.data_hora|date:"d/m H:i" }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- 4. RESUMO DOS ITENS COMPRADOS -->
+                    <tr>
+                        <td style="padding: 0 32px 28px;">
+                            <h3 style="margin: 0 0 14px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; font-weight: 800; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">
+                                Artigos do Pedido
+                            </h3>
+                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size: 13.5px; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 12px; text-transform: uppercase;">
+                                        <th align="left" style="padding: 8px 0;">Artigo</th>
+                                        <th align="center" style="padding: 8px 0;">Qtd</th>
+                                        <th align="right" style="padding: 8px 0;">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in itens %}
+                                    <tr style="border-bottom: 1px solid #f1f5f9;">
+                                        <td style="padding: 10px 0; color: #1e293b; font-weight: 600;">
+                                            {{ item.produto.nome }}
+                                            <div style="font-size: 12px; color: #94a3b8; font-weight: normal;">
+                                                Preço unitário: {{ item.preco_unitario|floatformat:2 }} Kz
+                                            </div>
+                                        </td>
+                                        <td align="center" style="padding: 10px 0; color: #475569;">
+                                            {{ item.quantidade }}
+                                        </td>
+                                        <td align="right" style="padding: 10px 0; color: #0f172a; font-weight: 700;">
+                                            {{ item.subtotal|floatformat:2 }} Kz
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="2" align="right" style="padding: 10px 0 4px; color: #64748b;">Subtotal:</td>
+                                        <td align="right" style="padding: 10px 0 4px; color: #334155; font-weight: 600;">{{ subtotal_formatado }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" align="right" style="padding: 4px 0; color: #64748b;">Taxa de Entrega:</td>
+                                        <td align="right" style="padding: 4px 0; color: #16a34a; font-weight: 600;">{{ frete_formatado }}</td>
+                                    </tr>
+                                    <tr style="border-top: 2px solid #e2e8f0;">
+                                        <td colspan="2" align="right" style="padding: 10px 0; font-size: 15px; font-weight: 800; color: #0f172a;">Total do Pedido:</td>
+                                        <td align="right" style="padding: 10px 0; font-size: 16px; font-weight: 800; color: #e67315;">{{ total_formatado }}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- 5. DADOS DE ENTREGA -->
+                    <tr>
+                        <td style="padding: 0 32px 32px;">
+                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px;">
+                                <tr>
+                                    <td>
+                                        <strong style="display: block; font-size: 12px; text-transform: uppercase; color: #64748b; margin-bottom: 6px; letter-spacing: 0.05em;">
+                                            📍 Endereço de Destino
+                                        </strong>
+                                        <p style="margin: 0 0 4px; font-size: 13.5px; font-weight: 700; color: #0f172a;">
+                                            {{ pedido.usuario.get_full_name|default:pedido.usuario.username }}
+                                        </p>
+                                        <p style="margin: 0; font-size: 13px; color: #475569;">
+                                            {% if perfil and perfil.bairro %}
+                                                {{ perfil.bairro }}, {{ perfil.municipio|default:"" }} - {{ perfil.provincia|default:"" }}
+                                            {% else %}
+                                                Endereço registrado na conta do cliente.
+                                            {% endif %}
+                                            {% if perfil and perfil.telefone %}
+                                                <br/>Contacto: {{ perfil.telefone }}
+                                            {% endif %}
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- 6. RODAPÉ INSTITUCIONAL -->
+                    <tr>
+                        <td style="background-color: #f8fafc; padding: 24px 32px; border-top: 1px solid #e2e8f0; text-align: center; color: #94a3b8; font-size: 12px; line-height: 1.6;">
+                            <p style="margin: 0 0 6px;">
+                                Dúvidas sobre a entrega? Acesse o link de rastreio ou entre em contato com o suporte.
+                            </p>
+                            <p style="margin: 0; font-size: 11px; color: #cbd5e1;">
+                                MiraComerce IA • Luanda, Angola • Mensagem transacional automática de acompanhamento.
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+

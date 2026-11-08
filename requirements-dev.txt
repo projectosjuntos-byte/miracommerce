@@ -1,0 +1,10 @@
+-r requirements.txt
+coverage==7.8.2
+ruff==0.11.10
+bandit==1.8.3
+pip-audit==2.9.0
+mypy==1.15.0
+django-stubs==4.2.7
+mypy-django-plugin==1.2.0
+types-requests==2.32.3
+types-PyYAML==6.0.12

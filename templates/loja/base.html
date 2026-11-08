@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="pt-br" data-theme="dark">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#101813">
+    <title>{% block title %}MiraComerce IA{% endblock %}</title>
+
+    <script nonce="{{ request.csp_nonce }}">
+        (function () {
+            var storedTheme;
+            try {
+                storedTheme = localStorage.getItem('mira_theme');
+            } catch (error) {
+                storedTheme = null;
+            }
+            var theme = storedTheme === 'light' || storedTheme === 'dark'
+                ? storedTheme
+                : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.dataset.theme = theme;
+            document.documentElement.style.colorScheme = theme;
+        }());
+    </script>
+
+    <link href="{% static 'loja/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'loja/css/icons.css' %}" rel="stylesheet">
+    <link href="{% static 'loja/css/accessibility.css' %}" rel="stylesheet">
+
+    <style nonce="{{ request.csp_nonce }}">
+        :root {
+            --primary-orange: #e67315;
+            --primary-yellow: #f1e682;
+            --dark-gray: #1a1d1e;
+            --light-gray: #f8f9fa;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light-gray);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-top: 95px;
+        }
+
+        .navbar-custom {
+            background: rgba(26, 29, 30, 0.98);
+            backdrop-filter: blur(10px);
+            padding: 0;
+            border-bottom: 2px solid var(--primary-orange);
+            height: 95px;
+            display: flex;
+            align-items: center;
+            z-index: 2000 !important;
+            width: 100%;
+        }
+
+        .navbar-brand {
+            position: relative;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-brand img {
+            height: 125px;
+            width: auto;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            left: 0;
+            transition: transform 0.3s ease;
+            filter: drop-shadow(0px 4px 8px rgba(0,0,0,0.4));
+        }
+
+        .navbar-brand:hover img {
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.85) !important;
+            font-weight: 600;
+            margin: 0 8px;
+            transition: 0.3s;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-yellow) !important;
+        }
+
+        .dropdown-menu {
+            background: #1d1f20;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 18px 30px rgba(0,0,0,0.35);
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .mega-menu {
+            min-width: 860px !important;
+            max-width: 860px !important;
+            padding: 0 !important;
+            background: #1d1f20 !important;
+            border-top: 3px solid #d9a75d;
+            border-radius: 0 !important;
+            overflow: hidden !important;
+            box-shadow: 0 18px 28px rgba(0, 0, 0, 0.28);
+        }
+
+        .dropdown-item {
+            color: rgba(255,255,255,0.72) !important;
+            font-size: 0.9rem;
+            padding: 7px 0;
+            transition: 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background: transparent !important;
+            color: var(--primary-yellow) !important;
+            transform: translateX(4px);
+        }
+
+        .category-block {
+            display: block;
+            background: transparent;
+            border: none;
+            padding: 0 18px;
+            min-height: 100%;
+            border-right: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .category-block:last-child {
+            border-right: none;
+        }
+
+        .category-block > .dropdown-item {
+            display: block;
+            padding: 12px 10px 12px 12px;
+            margin: 0;
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.01);
+            color: #f1a340 !important;
+            font-size: 0.8rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border-radius: 0;
+            line-height: 1.2;
+        }
+
+        .category-block > .dropdown-item:hover {
+            color: #f4bc62 !important;
+            transform: none;
+            background: rgba(255,255,255,0.02);
+        }
+
+        .subcategory-link {
+            display: flex !important;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 11px 12px;
+            color: rgba(255,255,255,0.9) !important;
+            font-size: 0.93rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background-color 0.2s ease, color 0.2s ease, padding-left 0.2s ease;
+            border-radius: 0;
+            line-height: 1.2;
+            background: transparent;
+            margin: 0;
+            text-align: left;
+        }
+
+        .subcategory-link i {
+            color: #f1a340;
+            width: 12px;
+            text-align: center;
+            font-size: 0.72rem;
+            flex-shrink: 0;
+        }
+
+        .subcategory-link:hover {
+            color: #f8d08d !important;
+            text-decoration: none;
+            background: rgba(255,255,255,0.02);
+            transform: translateX(2px);
+        }
+
+        .btn-cart {
+            background: var(--primary-orange);
+            color: white;
+            border-radius: 50px;
+            padding: 10px 22px;
+            font-weight: 600;
+            border: none;
+            transition: 0.3s;
+        }
+
+        .btn-cart:hover {
+            background: #cc6512;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(230, 115, 21, 0.3);
+        }
+
+        .site-footer {
+            background: var(--dark-gray);
+            color: #fff;
+            padding: 3.4rem 0 1.2rem;
+            margin-top: auto;
+            border-top: 4px solid var(--primary-orange);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: minmax(220px, 1.25fr) repeat(3, minmax(0, 1fr));
+            gap: 2.5rem;
+            align-items: start;
+        }
+
+        .footer-brand {
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .footer-brand-link {
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+            margin-bottom: 1rem;
+        }
+
+        .footer-brand-logo {
+            width: min(220px, 100%);
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.24));
+        }
+
+        .footer-brand-copy {
+            max-width: 235px;
+            margin: 0;
+            color: rgba(255,255,255,0.82);
+            font-size: 0.84rem;
+            line-height: 1.55;
+        }
+
+        .footer-column h2 {
+            margin: 0 0 1rem;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+        }
+
+        .footer-links {
+            display: grid;
+            gap: 0.7rem;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .footer-links li,
+        .footer-links a,
+        .footer-contact-item {
+            color: rgba(255,255,255,0.9);
+            font-size: 0.86rem;
+            line-height: 1.45;
+        }
+
+        .footer-links a {
+            display: inline-flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            text-decoration: none;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        .footer-links a:hover,
+        .footer-links a:focus-visible {
+            color: var(--primary-yellow);
+            transform: translateX(3px);
+        }
+
+        .footer-links a:focus-visible,
+        .footer-brand-link:focus-visible,
+        .footer-bottom a:focus-visible {
+            outline: 3px solid rgba(241,230,130,0.78);
+            outline-offset: 4px;
+            border-radius: 4px;
+        }
+
+        .footer-links i {
+            width: 1rem;
+            flex: 0 0 1rem;
+            margin-top: 0.15rem;
+            color: var(--primary-yellow);
+            text-align: center;
+        }
+
+        .footer-contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .footer-contact-item i {
+            width: 1rem;
+            flex: 0 0 1rem;
+            margin-top: 0.15rem;
+            color: var(--primary-yellow);
+            text-align: center;
+        }
+
+        .footer-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-top: 3rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255,255,255,0.22);
+            color: rgba(255,255,255,0.76);
+            font-size: 0.76rem;
+        }
+
+        .footer-bottom p {
+            margin: 0;
+        }
+
+        .footer-bottom a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        @media (max-width: 767.98px) {
+            .site-footer {
+                padding-top: 2.7rem;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 2rem 1.3rem;
+            }
+
+            .footer-brand {
+                grid-column: 1 / -1;
+                min-height: auto;
+            }
+
+            .footer-brand-logo {
+                width: 195px;
+            }
+
+            .footer-bottom {
+                align-items: flex-start;
+                flex-direction: column;
+                margin-top: 2.2rem;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .footer-links a {
+                transition: none;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .navbar-nav { margin-left: 260px; }
+            .mega-menu {
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                min-width: 850px;
+                padding: 30px;
+                margin-top: 15px;
+            }
+            .nav-item.dropdown:hover > .dropdown-menu,
+            .nav-item.dropdown:focus-within > .dropdown-menu,
+            .nav-item.dropdown.show > .dropdown-menu {
+                display: block;
+            }
+        }
+
+        @media (max-width: 991px) {
+            body { padding-top: 105px; }
+
+            .navbar-custom {
+                height: auto;
+                padding: 10px 0;
+            }
+
+            .navbar-brand img {
+                height: 85px;
+                position: relative;
+                top: 0;
+                transform: none;
+            }
+
+            .navbar-brand:hover img {
+                transform: scale(1.05);
+            }
+
+            .navbar-nav { margin-left: 0; }
+
+            .navbar-collapse,
+            .navbar-collapse.show {
+                display: block;
+            }
+
+            #navbarNav {
+                max-height: calc(100vh - 120px);
+                overflow-y: auto;
+                overflow-x: hidden;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .mega-menu {
+                position: static !important;
+                min-width: 100% !important;
+                max-width: 100% !important;
+                transform: none !important;
+                left: auto !important;
+                border-radius: 0 !important;
+                width: 100% !important;
+                max-height: none !important;
+                overflow: visible !important;
+            }
+
+            .dropdown-menu {
+                position: static !important;
+                float: none !important;
+                width: 100%;
+                margin-top: 0;
+                display: none !important;
+                max-height: none !important;
+                overflow: visible !important;
+            }
+
+            .dropdown-menu.show {
+                display: block !important;
+            }
+        }
+    </style>
+    <link href="{% static 'loja/css/experience.css' %}" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
+    <link href="{% static 'loja/css/theme.css' %}?v=theme-symbol-20261031" rel="stylesheet">
+</head>
+<body>
+    <a class="skip-link" href="#conteudo-principal">Saltar para o conteúdo principal</a>
+
+    <nav class="navbar navbar-expand-lg navbar-custom fixed-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand animate__animated animate__fadeInLeft" href="{% url 'home' %}">
+                <img src="{% static 'logo-mira.png' %}" alt="MiraComerce" width="160" height="95" fetchpriority="high">
+            </a>
+            
+            <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Abrir menu principal">
+                <i class="fas fa-bars" aria-hidden="true"></i>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Início</a></li>   
+
+                    <li class="nav-item dropdown categories-nav-item">
+                        <a class="nav-link dropdown-toggle" href="#" id="catDrop" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Categorias
+                        </a>
+                        <div class="dropdown-menu mega-menu animate__animated animate__fadeInUp" aria-labelledby="catDrop">
+                            {% if categorias_menu %}
+                                <div class="row g-0">
+                                    {% for categoria in categorias_menu %}
+                                        <div class="col-md-4">
+                                            <div class="category-block">
+                                                <a class="dropdown-item" href="{% url 'categoria_filtro' categoria.id %}#produtos-ancora">
+                                                    {{ categoria.nome }}
+                                                </a>
+                                                {% if categoria.subcategorias.all %}
+                                                    {% for subcategoria in categoria.subcategorias.all %}
+                                                        <a class="subcategory-link" href="{% url 'subcategoria_filtro' subcategoria.id %}#produtos-ancora">
+                                    <i class="fas fa-dot-circle" aria-hidden="true"></i> {{ subcategoria.nome }}
+                                                        </a>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="px-3 py-2 text-muted">Nenhuma categoria cadastrada.</div>
+                            {% endif %}
+                        </div>
+                    </li>
+
+                    <li class="nav-item"><a class="nav-link" href="{% url 'sobre' %}">Tecnologia IA</a></li>
+
+                                        <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="supportDrop" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Suporte
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="supportDrop">
+                            <li><a class="dropdown-item" href="{% url 'faq' %}"><i class="fas fa-circle-question me-2" aria-hidden="true"></i>FAQ</a></li>
+                            <li><a class="dropdown-item" href="{% url 'definicoes' %}"><i class="fas fa-sliders me-2" aria-hidden="true"></i>Definições</a></li>
+                        </ul>
+                    </li>
+
+{% if user.is_authenticated %}
+                        {% if user.is_staff %}
+                            <li class="nav-item">
+                                <a class="nav-link text-info" href="/admin/" target="_blank">
+                                    <i class="fas fa-user-shield me-1" aria-hidden="true"></i> Admin
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'meus_pedidos' %}" title="Acompanhar pedidos e entregas">
+                                <i class="fas fa-boxes-packing me-1 text-warning" aria-hidden="true"></i> Meus Pedidos
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <span class="nav-link text-warning small">Olá, {{ user.username }}</span>
+                        </li>
+                        <li class="nav-item">
+                            <form id="logout-form" class="d-none" action="{% url 'logout' %}" method="post">{% csrf_token %}</form>
+                            <button class="nav-link btn btn-link text-white" type="submit" form="logout-form" aria-label="Sair da conta">
+                                <i class="fas fa-power-off text-danger" aria-hidden="true"></i>
+                            </button>
+                        </li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Entrar</a></li>
+                        <li class="nav-item"><a class="nav-link btn btn-outline-warning btn-sm px-3 ms-2" href="{% url 'cadastro' %}">Criar Conta</a></li>
+                    {% endif %}
+
+                    <li class="nav-item">
+                        <a href="{% url 'exibir_carrinho' %}" class="btn btn-cart ms-lg-3">
+                            <i class="fas fa-shopping-cart me-2" aria-hidden="true"></i> 
+                            <span id="cart-count" class="badge rounded-circle bg-white text-dark">{{ total_itens_carrinho|default:0 }}</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item theme-nav-item">
+                        <button class="theme-toggle" type="button" data-theme-toggle role="switch" aria-checked="false" aria-label="Modo claro" title="Ativar modo claro">
+                            <span class="theme-symbol" data-theme-icon aria-hidden="true">☀</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main id="conteudo-principal">
+        {% if messages %}
+            <div class="container mt-3">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar aviso"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer" aria-labelledby="footer-title">
+        <div class="container">
+            <h2 id="footer-title" class="visually-hidden">Informações da MiraComerce</h2>
+
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a class="footer-brand-link" href="{% url 'home' %}" aria-label="MiraComerce, voltar à página inicial">
+                        <img class="footer-brand-logo" src="{% static 'logo-mira.png' %}" alt="MiraComerce" width="220" height="130" loading="lazy">
+                    </a>
+                    <p class="footer-brand-copy">Compras simples, seguras e inteligentes para o dia a dia.</p>
+                </div>
+
+                <div class="footer-column">
+                    <h2>Fale connosco</h2>
+                    <ul class="footer-links">
+                        <li class="footer-contact-item"><i class="fas fa-envelope" aria-hidden="true"></i><span>E-mail: suporte online</span></li>
+                        <li class="footer-contact-item"><i class="fas fa-phone" aria-hidden="true"></i><span>Telefone: +244 900 000 000</span></li>
+                        <li><a href="https://wa.me/244900000000" target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp" aria-hidden="true"></i><span>WhatsApp: falar com a equipa</span></a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h2>Políticas e ajuda</h2>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'faq' %}"><i class="fas fa-circle-question" aria-hidden="true"></i><span>Perguntas frequentes</span></a></li>
+                        <li><a href="{% url 'privacidade' %}"><i class="fas fa-shield-halved" aria-hidden="true"></i><span>Política de privacidade</span></a></li>
+                        <li><a href="{% url 'politica_devolucao' %}"><i class="fas fa-box-open" aria-hidden="true"></i><span>Devoluções e reembolsos</span></a></li>
+                        <li><a href="{% url 'guia' %}"><i class="fas fa-book-open" aria-hidden="true"></i><span>Primeiros passos</span></a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h2>Empresa</h2>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'sobre' %}"><i class="fas fa-building" aria-hidden="true"></i><span>Sobre nós</span></a></li>
+                        <li><a href="{% url 'meus_pedidos' %}"><i class="fas fa-boxes-packing" aria-hidden="true"></i><span>Meus Pedidos</span></a></li>
+                        <li><a href="{% url 'definicoes' %}"><i class="fas fa-sliders" aria-hidden="true"></i><span>Definições</span></a></li>
+                        <li><a href="{% url 'home' %}"><i class="fas fa-store" aria-hidden="true"></i><span>Voltar à loja</span></a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>© 2026 MiraComerce. Desenvolvido para TCC.</p>
+                <a href="{% url 'privacidade' %}">Privacidade e gestão de dados</a>
+            </div>
+        </div>
+    </footer>
+
+    <div class="modal fade" id="firstGuideModal" tabindex="-1" aria-labelledby="firstGuideModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl welcome-modal-dialog">
+            <div class="modal-content welcome-modal">
+                <div class="modal-header welcome-modal-header">
+                    <div>
+                        <span class="welcome-kicker">Guia de boas-vindas</span>
+                        <h5 class="modal-title" id="firstGuideModalLabel">Sua jornada começa aqui</h5>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+
+                <div class="modal-body welcome-modal-body">
+                    <div class="welcome-tour-grid" data-tour-layout="0">
+                        <div class="welcome-copy-column">
+                            <section class="welcome-copy-card" aria-live="polite">
+                                <div class="welcome-tour-brand">
+                                    <img class="welcome-tour-logo" src="{% static 'logo-mira.png' %}" alt="MiraComerce" width="612" height="408">
+                                    <div><span>MiraComerce IA</span><strong>Tour em 4 passos</strong></div>
+                                </div>
+                                <div class="welcome-progress" aria-label="Progresso do guia">
+                                    <span class="welcome-step-dot active" data-step-dot="0"><span class="visually-hidden">Passo 1 de 4</span></span>
+                                    <span class="welcome-step-dot" data-step-dot="1"><span class="visually-hidden">Passo 2 de 4</span></span>
+                                    <span class="welcome-step-dot" data-step-dot="2"><span class="visually-hidden">Passo 3 de 4</span></span>
+                                    <span class="welcome-step-dot" data-step-dot="3"><span class="visually-hidden">Passo 4 de 4</span></span>
+                                </div>
+                                <div class="welcome-tour-step active" data-tour-step="0">
+                                    <h3>Explore com facilidade</h3>
+                                    <p>Descubra categorias e subcategorias com uma navegação clara, rápida e intuitiva.</p>
+                                </div>
+                                <div class="welcome-tour-step" data-tour-step="1" hidden>
+                                    <h3>Escolha o melhor item</h3>
+                                    <p>Revise nome, preço, promoções e recomendações antes de adicionar ao carrinho.</p>
+                                </div>
+                                <div class="welcome-tour-step" data-tour-step="2" hidden>
+                                    <h3>Adicione e confirme</h3>
+                                    <p>Use o carrinho para ajustar quantidades e verificar o total final antes do fechamento.</p>
+                                </div>
+                                <div class="welcome-tour-step" data-tour-step="3" hidden>
+                                    <h3>Finalize sua compra</h3>
+                                    <p>Conclua com segurança e aproveite uma experiência pensada para acompanhar cada etapa.</p>
+                                </div>
+                            </section>
+                        </div>
+
+                        <div class="welcome-visual-column">
+                            <section class="welcome-visual" data-tour-layout="0" aria-label="Resumo visual da compra">
+                                <article class="welcome-visual-card" data-tour-card="navigation">
+                                    <div class="welcome-card-title"><span>Navegação</span><strong>Premium</strong></div>
+                                    <div class="welcome-mini-nav"><span class="active">Início</span><span>Categorias</span><span>IA</span></div>
+                                </article>
+                                <article class="welcome-visual-card" data-tour-card="product">
+                                    <div class="welcome-card-title"><span>Produto</span><strong>Promoção</strong></div>
+                                    <div class="welcome-product-preview"><span class="welcome-product-thumb"></span><div><span></span><span></span><span></span></div></div>
+                                </article>
+                                <article class="welcome-visual-card" data-tour-card="cart">
+                                    <div class="welcome-card-title"><span>Carrinho</span><strong>R$ 189,90</strong></div>
+                                    <div class="welcome-cart-preview"><span></span><span></span><span></span><span></span><span></span></div>
+                                </article>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer welcome-modal-footer">
+                    <button type="button" class="welcome-skip" data-tour-skip>Pular</button>
+                    <div class="welcome-actions">
+                        <button type="button" class="welcome-back" data-tour-back disabled>Voltar</button>
+                        <button type="button" class="welcome-next" data-tour-next>Próximo</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style nonce="{{ request.csp_nonce }}">
+        #firstGuideModal .welcome-modal-dialog { max-width: 960px; }
+        #firstGuideModal .welcome-modal { overflow: hidden; border: 0; border-radius: 18px; background: linear-gradient(135deg, #1a1d1e, #282d2d); color: #fff; box-shadow: 0 24px 64px rgba(0,0,0,.45); }
+        #firstGuideModal .welcome-modal-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; padding: 1.1rem 1.2rem 0; border: 0; }
+        #firstGuideModal .welcome-kicker { display: inline-block; margin-bottom: .45rem; padding: .42rem .9rem; border-radius: 999px; background: #ffc107; color: #171a1d; font-size: .68rem; font-weight: 800; line-height: 1; }
+        #firstGuideModal .welcome-modal-title { color: #fff; }
+        #firstGuideModal .modal-title { color: #fff; font-size: 1.1rem; font-weight: 750; letter-spacing: -.02em; }
+        #firstGuideModal .welcome-modal-body { padding: 1.25rem; }
+        #firstGuideModal .welcome-tour-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+        #firstGuideModal .welcome-copy-column, #firstGuideModal .welcome-visual-column { min-width: 0; }
+        #firstGuideModal .welcome-copy-card { display: flex; min-height: 100%; flex-direction: column; justify-content: center; padding: 1.25rem; border: 1px solid rgba(255,255,255,.1); border-radius: 16px; background: rgba(255,255,255,.04); }
+        #firstGuideModal .welcome-tour-brand { display: flex; align-items: center; gap: .75rem; }
+        #firstGuideModal .welcome-tour-brand > div { display: grid; gap: .16rem; }
+        #firstGuideModal .welcome-tour-brand span { color: rgba(255,255,255,.72); font-size: .75rem; }
+        #firstGuideModal .welcome-tour-brand strong { color: #fff; font-size: .87rem; }
+        #firstGuideModal .welcome-tour-logo { width: 82px; height: 54px; flex: 0 0 auto; object-fit: contain; }
+        #firstGuideModal .welcome-progress { display: flex; gap: .45rem; margin: 1.25rem 0; }
+        #firstGuideModal .welcome-step-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,.22); transition: background-color 200ms ease, transform 200ms ease; }
+        #firstGuideModal .welcome-step-dot.active { background: linear-gradient(135deg, #f1e682, #e67315); transform: scale(1.08); }
+        #firstGuideModal .welcome-tour-step h3 { margin: 0 0 .55rem; color: #fff; font-size: clamp(1.4rem, 3vw, 1.95rem); font-weight: 760; letter-spacing: -.045em; line-height: 1.04; }
+        #firstGuideModal .welcome-tour-step p { margin: 0; color: rgba(255,255,255,.74); font-size: .88rem; line-height: 1.55; }
+        #firstGuideModal .welcome-visual { display: grid; min-height: 332px; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-template-rows: repeat(4, minmax(0, 1fr)); gap: .75rem; padding: 1rem; border: 1px solid rgba(255,255,255,.09); border-radius: 16px; background: linear-gradient(135deg, rgba(241,230,130,.18), rgba(230,115,21,.08)); }
+        #firstGuideModal .welcome-visual-card { display: flex; min-width: 0; flex-direction: column; justify-content: space-between; overflow: hidden; padding: .9rem; border: 1px solid rgba(255,255,255,.09); border-radius: 14px; background: rgba(255,255,255,.04); }
+        #firstGuideModal .welcome-card-title { display: flex; align-items: center; justify-content: space-between; gap: .5rem; color: rgba(255,255,255,.74); font-size: .68rem; }
+        #firstGuideModal .welcome-card-title strong { color: #f1e682; font-size: .67rem; font-weight: 800; white-space: nowrap; }
+        #firstGuideModal .welcome-mini-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .45rem; }
+        #firstGuideModal .welcome-mini-nav span { overflow: hidden; padding: .4rem .25rem; border: 1px solid rgba(255,255,255,.1); border-radius: 999px; color: rgba(255,255,255,.8); font-size: .65rem; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+        #firstGuideModal .welcome-mini-nav .active { border-color: rgba(241,230,130,.36); background: rgba(241,230,130,.16); color: #f1e682; }
+        #firstGuideModal .welcome-product-preview { display: flex; align-items: center; gap: .7rem; }
+        #firstGuideModal .welcome-product-thumb { display: block; width: clamp(42px, 6vw, 60px); height: clamp(42px, 6vw, 60px); flex: 0 0 auto; border-radius: 14px; background: linear-gradient(135deg, #f1e682, #e67315); }
+        #firstGuideModal .welcome-product-preview > div { display: grid; width: min(100%, 180px); gap: .42rem; }
+        #firstGuideModal .welcome-product-preview > div span { display: block; width: 100%; height: 8px; border-radius: 999px; background: rgba(255,255,255,.2); }
+        #firstGuideModal .welcome-product-preview > div span:first-child { width: 58%; }
+        #firstGuideModal .welcome-product-preview > div span:last-child { width: 48%; }
+        #firstGuideModal .welcome-cart-preview { display: grid; grid-template-columns: 1.2fr .85fr .55fr; gap: .42rem; }
+        #firstGuideModal .welcome-cart-preview span { display: block; height: 8px; border-radius: 999px; background: rgba(255,255,255,.16); }
+        #firstGuideModal .welcome-cart-preview span:nth-child(4) { grid-column: span 2; width: 78%; }
+        #firstGuideModal .welcome-cart-preview span:nth-child(5) { width: 100%; }
+        #firstGuideModal .welcome-visual[data-tour-layout="0"] { grid-template-rows: .8fr 1.05fr .85fr; }
+        #firstGuideModal .welcome-visual[data-tour-layout="0"] [data-tour-card="navigation"] { grid-area: 1 / 1 / 2 / 13; }
+        #firstGuideModal .welcome-visual[data-tour-layout="0"] [data-tour-card="product"] { grid-area: 2 / 1 / 3 / 13; }
+        #firstGuideModal .welcome-visual[data-tour-layout="0"] [data-tour-card="cart"] { grid-area: 3 / 1 / 4 / 13; }
+        #firstGuideModal .welcome-visual[data-tour-layout="1"] [data-tour-card="navigation"] { grid-area: 1 / 1 / 3 / 5; }
+        #firstGuideModal .welcome-visual[data-tour-layout="1"] [data-tour-card="product"] { grid-area: 1 / 5 / 3 / 13; }
+        #firstGuideModal .welcome-visual[data-tour-layout="1"] [data-tour-card="cart"] { grid-area: 3 / 1 / 5 / 13; }
+        #firstGuideModal .welcome-visual[data-tour-layout="2"] [data-tour-card="navigation"] { grid-area: 1 / 1 / 3 / 7; }
+        #firstGuideModal .welcome-visual[data-tour-layout="2"] [data-tour-card="product"] { grid-area: 1 / 7 / 3 / 13; }
+        #firstGuideModal .welcome-visual[data-tour-layout="2"] [data-tour-card="cart"] { grid-area: 3 / 1 / 5 / 13; }
+        #firstGuideModal .welcome-visual[data-tour-layout="3"] [data-tour-card="navigation"] { grid-area: 1 / 1 / 5 / 4; }
+        #firstGuideModal .welcome-visual[data-tour-layout="3"] [data-tour-card="product"] { grid-area: 1 / 4 / 3 / 13; }
+        #firstGuideModal .welcome-visual[data-tour-layout="3"] [data-tour-card="cart"] { grid-area: 3 / 4 / 5 / 13; }
+        @media (min-width: 992px) { #firstGuideModal .welcome-tour-grid { grid-template-columns: 5fr 7fr; } #firstGuideModal .welcome-tour-grid[data-tour-layout="1"] { grid-template-columns: 6.4fr 5.6fr; } #firstGuideModal .welcome-tour-grid[data-tour-layout="2"] { grid-template-columns: 4.2fr 7.8fr; } #firstGuideModal .welcome-tour-grid[data-tour-layout="3"] { grid-template-columns: 6fr 6fr; } #firstGuideModal .welcome-tour-grid[data-tour-layout="1"] .welcome-copy-card { min-height: 360px; } #firstGuideModal .welcome-tour-grid[data-tour-layout="2"] .welcome-visual { min-height: 360px; } }
+        #firstGuideModal .welcome-modal-footer { display: flex; align-items: center; gap: 1rem; padding: 0 1.25rem 1.25rem; border: 0; }
+        #firstGuideModal .welcome-skip { min-height: 40px; padding: .45rem 0; border: 0; background: transparent; color: rgba(255,255,255,.72); font: inherit; font-size: .83rem; }
+        #firstGuideModal .welcome-actions { display: flex; gap: .5rem; margin-left: auto; }
+        #firstGuideModal .welcome-back, #firstGuideModal .welcome-next { min-height: 40px; padding: .5rem .8rem; border-radius: 7px; font: inherit; font-size: .82rem; font-weight: 750; }
+        #firstGuideModal .welcome-back { border: 1px solid rgba(255,255,255,.8); background: transparent; color: #fff; }
+        #firstGuideModal .welcome-back:disabled { border-color: rgba(255,255,255,.22); color: rgba(255,255,255,.38); cursor: not-allowed; }
+        #firstGuideModal .welcome-next { border: 1px solid #ffc107; background: #ffc107; color: #171a1d; }
+        #firstGuideModal .welcome-skip:hover, #firstGuideModal .welcome-back:hover:not(:disabled) { color: #f1e682; }
+        #firstGuideModal .welcome-next:hover { border-color: #ffd45a; background: #ffd45a; }
+        #firstGuideModal .welcome-skip:focus-visible, #firstGuideModal .welcome-back:focus-visible, #firstGuideModal .welcome-next:focus-visible { outline: 3px solid rgba(241,230,130,.7); outline-offset: 3px; }
+        @media (prefers-reduced-motion: no-preference) { #firstGuideModal .welcome-visual[data-tour-layout="0"] .welcome-visual-card { animation: welcome-card-enter-0 260ms ease both; } #firstGuideModal .welcome-visual[data-tour-layout="1"] .welcome-visual-card { animation: welcome-card-enter-1 260ms ease both; } #firstGuideModal .welcome-visual[data-tour-layout="2"] .welcome-visual-card { animation: welcome-card-enter-2 260ms ease both; } #firstGuideModal .welcome-visual[data-tour-layout="3"] .welcome-visual-card { animation: welcome-card-enter-3 260ms ease both; } #firstGuideModal .welcome-visual-card:nth-child(2) { animation-delay: 45ms; } #firstGuideModal .welcome-visual-card:nth-child(3) { animation-delay: 90ms; } }
+        @keyframes welcome-card-enter-0 { from { opacity: .35; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes welcome-card-enter-1 { from { opacity: .35; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes welcome-card-enter-2 { from { opacity: .35; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes welcome-card-enter-3 { from { opacity: .35; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 991.98px) { #firstGuideModal .welcome-copy-card { min-height: 220px; } #firstGuideModal .welcome-visual { min-height: 300px; } }
+        @media (max-width: 575.98px) { #firstGuideModal .welcome-modal-dialog { max-width: calc(100% - 1rem); margin: .5rem auto; } #firstGuideModal .welcome-modal-header { padding: 1rem 1rem 0; } #firstGuideModal .welcome-modal-body { max-height: calc(100dvh - 155px); padding: 1rem; overflow-y: auto; } #firstGuideModal .welcome-visual { min-height: 280px; padding: .7rem; gap: .55rem; } #firstGuideModal .welcome-visual-card { padding: .65rem; } #firstGuideModal .welcome-card-title { font-size: .61rem; } #firstGuideModal .welcome-mini-nav { gap: .25rem; } #firstGuideModal .welcome-mini-nav span { padding: .3rem .14rem; font-size: .54rem; } #firstGuideModal .welcome-modal-footer { padding: 0 1rem 1rem; } #firstGuideModal .welcome-actions { flex: 1; } #firstGuideModal .welcome-back, #firstGuideModal .welcome-next { flex: 1; padding-inline: .5rem; } }
+    </style>
+
+    <script src="{% static 'loja/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'loja/js/site.js' %}?v=theme-symbol-20261031" defer></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

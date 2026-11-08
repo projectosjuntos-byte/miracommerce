@@ -1,0 +1,233 @@
+/* Tema claro: preserva o verde e o laranja da MiraComerce com superfícies arejadas. */
+html[data-theme="light"] {
+    --mira-ink: #eef3ec;
+    --mira-ink-raised: #ffffff;
+    --mira-ink-soft: #e4ede4;
+    --mira-paper: #15241a;
+    --mira-mist: #3d5143;
+    --mira-muted: #5c6d60;
+    --mira-accent: #b9470c;
+    --mira-accent-deep: #8f3708;
+    --mira-line: rgba(21, 36, 26, 0.14);
+    --mira-shadow: 0 24px 70px rgba(20, 42, 27, 0.14);
+    background: var(--mira-ink);
+}
+
+html[data-theme="light"] body {
+    background: var(--mira-ink);
+    color: var(--mira-paper);
+}
+
+.theme-nav-item {
+    display: flex;
+    align-items: center;
+}
+
+.theme-toggle {
+    display: grid;
+    width: 38px;
+    height: 38px;
+    place-items: center;
+    padding: 0;
+    border: 1px solid rgba(237, 241, 231, 0.2);
+    border-radius: 12px;
+    background: transparent;
+    color: var(--mira-paper);
+    font-size: 0.92rem;
+    transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.theme-symbol {
+    display: block;
+    font-family: "Segoe UI Symbol", "Noto Sans Symbols", sans-serif;
+    font-size: 1.15rem;
+    line-height: 1;
+}
+
+.theme-toggle:hover,
+.theme-toggle:focus-visible {
+    border-color: rgba(244, 122, 31, 0.65);
+    background: rgba(244, 122, 31, 0.12);
+    color: var(--mira-accent);
+}
+
+.theme-toggle:active { transform: translateY(1px) scale(0.97); }
+
+.theme-toggle:focus-visible {
+    outline: 3px solid rgba(244, 122, 31, 0.38);
+    outline-offset: 3px;
+}
+
+/* Sol branco no escuro e lua preta no claro. */
+html[data-theme="dark"] .theme-symbol { color: #ffffff; }
+html[data-theme="light"] .theme-symbol { color: #15241a; }
+
+@media (min-width: 992px) {
+    .navbar-nav { width: 100%; }
+    .theme-nav-item { margin-left: auto; padding-left: 1rem; }
+}
+
+html[data-theme="light"] .navbar-custom {
+    background: rgba(255, 255, 255, 0.9);
+    border-bottom: 1px solid var(--mira-line);
+    box-shadow: 0 8px 26px rgba(20, 42, 27, 0.08) !important;
+}
+
+html[data-theme="light"] .nav-link { color: rgba(21, 36, 26, 0.78) !important; }
+html[data-theme="light"] .navbar-toggler { color: var(--mira-paper) !important; border-color: var(--mira-line); }
+html[data-theme="light"] .navbar-collapse { background: var(--mira-ink) !important; }
+
+html[data-theme="light"] .theme-toggle {
+    border-color: var(--mira-line);
+    background: #f7faf6;
+    color: var(--mira-paper);
+}
+
+html[data-theme="light"] .dropdown-menu,
+html[data-theme="light"] .mega-menu {
+    background: #ffffff !important;
+    border-color: var(--mira-line);
+    box-shadow: 0 18px 36px rgba(20, 42, 27, 0.15);
+}
+
+html[data-theme="light"] .dropdown-item,
+html[data-theme="light"] .subcategory-link { color: var(--mira-mist) !important; }
+html[data-theme="light"] .category-block,
+html[data-theme="light"] .category-block > .dropdown-item { border-color: var(--mira-line); }
+html[data-theme="light"] .category-block > .dropdown-item { color: var(--mira-accent) !important; }
+
+html[data-theme="light"] .site-footer { background: #e4ece3; }
+html[data-theme="light"] .footer-brand-copy,
+html[data-theme="light"] .footer-links li,
+html[data-theme="light"] .footer-links a,
+html[data-theme="light"] .footer-contact-item,
+html[data-theme="light"] .footer-bottom { color: var(--mira-mist); }
+html[data-theme="light"] .footer-column h2,
+html[data-theme="light"] .footer-bottom a { color: var(--mira-paper); }
+
+html[data-theme="light"] .market-home,
+html[data-theme="light"] .auth-page,
+html[data-theme="light"] .technology-page,
+html[data-theme="light"] .guide-shell {
+    background:
+        radial-gradient(circle at 82% 0%, rgba(185, 71, 12, 0.12), transparent 28rem),
+        var(--mira-ink);
+}
+
+html[data-theme="light"] .hero-art { background: #dbe8dc; }
+html[data-theme="light"] .hero-art::after { background: linear-gradient(90deg, rgba(238, 243, 236, 0.18), transparent 44%), linear-gradient(0deg, rgba(21, 36, 26, 0.32), transparent 34%); }
+html[data-theme="light"] .category-tile-fallback { background: linear-gradient(145deg, #d9e5d9, #f7faf6); }
+html[data-theme="light"] .product-add[disabled] { background: #cbd6cc; color: #506052; }
+html[data-theme="light"] .toast-ia { background: #ffffff; }
+
+html[data-theme="light"] .auth-story { background: #dfe9de; }
+html[data-theme="light"] .auth-field input { border-color: rgba(21, 36, 26, 0.22); }
+html[data-theme="light"] .auth-field input:hover { border-color: rgba(21, 36, 26, 0.42); }
+html[data-theme="light"] .auth-field input:focus { background: #ffffff; }
+html[data-theme="light"] .auth-alert { color: #8a1f18; }
+html[data-theme="light"] .auth-field-error { color: #a12b22; }
+
+html[data-theme="light"] .technology-actions .btn-outline-light,
+html[data-theme="light"] .guide-actions .btn-outline-light {
+    border-color: rgba(21, 36, 26, 0.32);
+    color: var(--mira-paper);
+}
+
+html[data-theme="light"] .technology-actions .btn-outline-light:hover,
+html[data-theme="light"] .technology-actions .btn-outline-light:focus-visible,
+html[data-theme="light"] .guide-actions .btn-outline-light:hover,
+html[data-theme="light"] .guide-actions .btn-outline-light:focus-visible {
+    color: var(--mira-paper);
+}
+
+html[data-theme="light"] .core-visual { background: #d8e4d7; }
+html[data-theme="light"] .core-visual::after { background: linear-gradient(180deg, transparent 44%, rgba(21, 36, 26, 0.82) 100%); }
+
+html[data-theme="light"] .faq-question::after { filter: none; }
+html[data-theme="light"] .settings-form .form-control,
+html[data-theme="light"] .settings-form .form-select { background: #ffffff; color: var(--mira-paper); }
+
+html[data-theme="light"] .tour-modal-content { background: #ffffff; color: var(--mira-paper); box-shadow: 0 28px 72px rgba(20, 42, 27, 0.24); }
+html[data-theme="light"] .tour-copy { background: #e4ede4; }
+html[data-theme="light"] .tour-close { background: rgba(21, 36, 26, 0.07); color: var(--mira-paper); }
+html[data-theme="light"] .tour-scene,
+html[data-theme="light"] .tour-product-stage,
+html[data-theme="light"] .tour-cart-stage,
+html[data-theme="light"] .tour-confirm-stage { background: #e4ede4; }
+html[data-theme="light"] .tour-image-scrim { background: linear-gradient(180deg, rgba(238, 243, 236, 0.05) 22%, rgba(21, 36, 26, 0.78) 100%); }
+html[data-theme="light"] .tour-image-scrim--strong { background: rgba(21, 36, 26, 0.5); }
+
+html[data-theme="light"] .btn-cart,
+html[data-theme="light"] .hero-cta,
+html[data-theme="light"] .product-add,
+html[data-theme="light"] .auth-submit,
+html[data-theme="light"] .guide-header .btn,
+html[data-theme="light"] .guide-actions .btn-warning,
+html[data-theme="light"] .technology-actions .btn-warning,
+html[data-theme="light"] .settings-page .btn-dark,
+html[data-theme="light"] .faq-intro-mark,
+html[data-theme="light"] .tour-next,
+html[data-theme="light"] .tour-mark {
+    color: #fffdf9;
+}
+
+html[data-theme="light"] .btn-cart:hover,
+html[data-theme="light"] .btn-cart:focus-visible,
+html[data-theme="light"] .hero-cta:hover,
+html[data-theme="light"] .hero-cta:focus-visible,
+html[data-theme="light"] .product-add:hover,
+html[data-theme="light"] .product-add:focus-visible,
+html[data-theme="light"] .auth-submit:hover,
+html[data-theme="light"] .auth-submit:focus-visible,
+html[data-theme="light"] .guide-header .btn:hover,
+html[data-theme="light"] .guide-header .btn:focus-visible,
+html[data-theme="light"] .guide-actions .btn-warning:hover,
+html[data-theme="light"] .guide-actions .btn-warning:focus-visible,
+html[data-theme="light"] .technology-actions .btn-warning:hover,
+html[data-theme="light"] .technology-actions .btn-warning:focus-visible,
+html[data-theme="light"] .settings-page .btn-dark:hover,
+html[data-theme="light"] .settings-page .btn-dark:focus-visible {
+    border-color: var(--mira-accent-deep);
+    background: var(--mira-accent-deep);
+    color: #fffdf9;
+}
+
+html[data-theme="light"] #firstGuideModal .welcome-modal {
+    background: linear-gradient(135deg, #ffffff, #edf4eb);
+    color: var(--mira-paper);
+    box-shadow: 0 24px 64px rgba(20, 42, 27, 0.3);
+}
+
+html[data-theme="light"] #firstGuideModal .modal-title,
+html[data-theme="light"] #firstGuideModal .welcome-modal-title,
+html[data-theme="light"] #firstGuideModal .welcome-tour-brand strong,
+html[data-theme="light"] #firstGuideModal .welcome-tour-step h3 { color: var(--mira-paper); }
+html[data-theme="light"] #firstGuideModal .welcome-tour-brand span,
+html[data-theme="light"] #firstGuideModal .welcome-tour-step p,
+html[data-theme="light"] #firstGuideModal .welcome-card-title,
+html[data-theme="light"] #firstGuideModal .welcome-skip { color: var(--mira-muted); }
+html[data-theme="light"] #firstGuideModal .welcome-copy-card,
+html[data-theme="light"] #firstGuideModal .welcome-visual-card { border-color: var(--mira-line); background: rgba(255, 255, 255, 0.72); }
+html[data-theme="light"] #firstGuideModal .welcome-visual { border-color: var(--mira-line); background: linear-gradient(135deg, rgba(185, 71, 12, 0.15), rgba(207, 225, 205, 0.76)); }
+html[data-theme="light"] #firstGuideModal .welcome-step-dot { background: rgba(21, 36, 26, 0.2); }
+html[data-theme="light"] #firstGuideModal .welcome-step-dot.active { background: var(--mira-accent); }
+html[data-theme="light"] #firstGuideModal .welcome-mini-nav span { border-color: var(--mira-line); color: var(--mira-mist); }
+html[data-theme="light"] #firstGuideModal .welcome-mini-nav .active { border-color: rgba(185, 71, 12, 0.45); background: rgba(185, 71, 12, 0.1); color: var(--mira-accent); }
+html[data-theme="light"] #firstGuideModal .welcome-card-title strong { color: var(--mira-accent); }
+html[data-theme="light"] #firstGuideModal .welcome-product-preview > div span,
+html[data-theme="light"] #firstGuideModal .welcome-cart-preview span { background: rgba(21, 36, 26, 0.18); }
+html[data-theme="light"] #firstGuideModal .welcome-back { border-color: rgba(21, 36, 26, 0.72); color: var(--mira-paper); }
+html[data-theme="light"] #firstGuideModal .welcome-back:disabled { border-color: rgba(21, 36, 26, 0.18); color: rgba(21, 36, 26, 0.38); }
+html[data-theme="light"] #firstGuideModal .welcome-skip:hover,
+html[data-theme="light"] #firstGuideModal .welcome-back:hover:not(:disabled) { color: var(--mira-accent); }
+
+@media (max-width: 991.98px) {
+    .theme-nav-item { display: block; width: calc(100% - 1.24rem); margin: 0.4rem 0.62rem; padding-left: 0; }
+    .theme-toggle { width: 100%; height: 42px; justify-content: flex-start; padding: 0 0.75rem; }
+    .theme-toggle::after { content: "Modo claro"; margin-left: 0.55rem; font-size: 0.8rem; font-weight: 700; }
+    html[data-theme="light"] .theme-toggle::after { content: "Modo escuro"; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .theme-toggle { transition: none; }
+}

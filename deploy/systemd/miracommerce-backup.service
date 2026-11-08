@@ -1,0 +1,10 @@
+[Unit]
+Description=Backup do banco e media do MiraComerce
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=miracommerce
+Group=miracommerce
+EnvironmentFile=/etc/miracommerce.env
+ExecStart=/srv/miracommerce/deploy/backup/backup.sh
