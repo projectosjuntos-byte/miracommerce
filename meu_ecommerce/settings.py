@@ -358,9 +358,12 @@ SIMPLEUI_ICON = {
     'Auditoria administrativas': 'fas fa-shield-halved',
 }
 
-# Em desenvolvimento sem credenciais SMTP no .env, exibe os e-mails no console
-# Em produção ou com credenciais configuradas, utiliza o envio SMTP real
-if DEBUG and not os.environ.get('EMAIL_HOST_PASSWORD'):
+# Em desenvolvimento ou sem credenciais SMTP, exibe os e-mails no console.
+# Em produção com credenciais configuradas, utiliza o envio SMTP real.
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '').strip()
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '').strip()
+
+if not EMAIL_HOST_PASSWORD or EMAIL_HOST_USER in ('seu-email@gmail.com', ''):
     EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
 else:
     EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
@@ -368,16 +371,16 @@ else:
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
 EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() in ('1', 'true', 'yes', 'on')
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'seu-email@gmail.com')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'MiraComerce IA <seu-email@gmail.com>')
-SERVER_EMAIL = os.environ.get('SERVER_EMAIL', 'seu-email@gmail.com')
-if not DEBUG and (
-    not EMAIL_HOST_USER
-    or not EMAIL_HOST_PASSWORD
-    or EMAIL_HOST_USER == 'seu-email@gmail.com'
-):
-    raise ImproperlyConfigured('Configure EMAIL_HOST_USER e EMAIL_HOST_PASSWORD em produção.')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER or 'MiraComerce IA <no-reply@miracommerce.app>')
+SERVER_EMAIL = os.environ.get('SERVER_EMAIL', EMAIL_HOST_USER or 'no-reply@miracommerce.app')
+
+if not DEBUG and not TESTING and not IS_COLLECTSTATIC and not _env_bool('VERCEL', False):
+    if (
+        not EMAIL_HOST_USER
+        or not EMAIL_HOST_PASSWORD
+        or EMAIL_HOST_USER == 'seu-email@gmail.com'
+    ):
+        raise ImproperlyConfigured('Configure EMAIL_HOST_USER e EMAIL_HOST_PASSWORD em produção.')
 
 if not DEBUG and not CSRF_TRUSTED_ORIGINS:
     raise ImproperlyConfigured('CSRF_TRUSTED_ORIGINS deve ser definida em produção.')
