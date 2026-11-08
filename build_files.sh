@@ -4,8 +4,17 @@
 # ==============================================================================
 set -e
 
+# PEP 668 bypass para ambientes gerenciados da Vercel / uv
+export PIP_BREAK_SYSTEM_PACKAGES=1
+
 echo "==> [Vercel Build] 1/3 - Instalando dependencias..."
-python3 -m pip install -r requirements.txt
+if command -v uv &> /dev/null; then
+    echo "==> Usando uv para instalacao rapida no sistema..."
+    uv pip install --system -r requirements.txt
+else
+    echo "==> Usando pip com --break-system-packages..."
+    python3 -m pip install --break-system-packages -r requirements.txt || python3 -m pip install -r requirements.txt
+fi
 
 echo "==> [Vercel Build] 2/3 - Coletando arquivos estaticos para Edge CDN..."
 python3 manage.py collectstatic --noinput --clear
