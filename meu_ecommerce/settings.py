@@ -124,7 +124,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'meu_ecommerce.wsgi.application'
 
-DB_ENGINE = os.environ.get('DB_ENGINE', 'django.db.backends.mysql').strip()
+DB_ENGINE = os.environ.get('DB_ENGINE', 'django.db.backends.mysql')
 DATABASE_URL = os.environ.get('DATABASE_URL')
 if DATABASE_URL:
     try:
