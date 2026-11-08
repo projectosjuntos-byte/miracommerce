@@ -124,6 +124,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'meu_ecommerce.wsgi.application'
 
+DB_ENGINE = os.environ.get('DB_ENGINE', 'django.db.backends.mysql').strip()
 DATABASE_URL = os.environ.get('DATABASE_URL')
 if DATABASE_URL:
     try:
@@ -165,9 +166,8 @@ if DATABASE_URL:
             query_params = parse_qs(u.query)
             sslmode = query_params.get('sslmode', ['require'])[0]
             DATABASES['default']['OPTIONS'] = {'sslmode': sslmode}
-    DB_ENGINE = DATABASES['default']['ENGINE']
+    DB_ENGINE = DATABASES['default'].get('ENGINE', 'django.db.backends.postgresql')
 else:
-    DB_ENGINE = os.environ.get('DB_ENGINE', 'django.db.backends.mysql')
     if DB_ENGINE == 'django.db.backends.sqlite3':
         DATABASES = {
             'default': {
@@ -304,8 +304,10 @@ CACHES = {
         'KEY_PREFIX': 'miracommerce',
     }
 }
-if not DEBUG and 'sqlite' not in DB_ENGINE and not DATABASES['default'].get('PASSWORD'):
-    raise ImproperlyConfigured('DB_PASSWORD deve ser definida em produção.')
+if not DEBUG and not TESTING and not IS_COLLECTSTATIC:
+    engine = DATABASES['default'].get('ENGINE', '')
+    if 'sqlite' not in engine and not DATABASES['default'].get('PASSWORD'):
+        raise ImproperlyConfigured('DB_PASSWORD deve ser definida em produção.')
 
 if not DEBUG and MEDIA_STORAGE_BACKEND != 'django.core.files.storage.FileSystemStorage':
     if not AWS_STORAGE_BUCKET_NAME:
