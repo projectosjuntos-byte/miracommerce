@@ -1,0 +1,17 @@
+Django==4.2.25
+celery==5.5.3
+mysqlclient==2.2.8; sys_platform == 'win32'
+PyMySQL==1.1.1
+psycopg2-binary>=2.9.10
+dj-database-url>=2.3.0
+django-redis==5.4.0
+redis>=5.0.0
+python-dotenv==1.2.3
+reportlab==5.0.1
+django-simpleui==2026.1.13
+gunicorn==23.0.0
+Pillow>=10.4.0
+django-storages==1.14.6
+boto3==1.38.27
+prometheus-client==0.22.0
+sentry-sdk==2.27.0
