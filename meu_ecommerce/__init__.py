@@ -1,9 +1,13 @@
-# Suporte automatico a PyMySQL caso mysqlclient nao esteja compilado no ambiente (Vercel/Linux)
+# Suporte automatico a PyMySQL caso mysqlclient nao esteja compilado no ambiente (Vercel/Serverless)
 try:
-    import pymysql
-    pymysql.install_as_MySQLdb()
+    import MySQLdb  # noqa: F401
 except ImportError:
-    pass
+    try:
+        import pymysql
+        pymysql.version_info = (2, 2, 8, "final", 0)
+        pymysql.install_as_MySQLdb()
+    except ImportError:
+        pass
 
 from .celery import app as celery_app
 
