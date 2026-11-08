@@ -165,10 +165,7 @@ if DATABASE_URL:
             query_params = parse_qs(u.query)
             sslmode = query_params.get('sslmode', ['require'])[0]
             DATABASES['default']['OPTIONS'] = {'sslmode': sslmode}
-            DATABASES['default']['OPTIONS'] = {
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-                'charset': 'utf8mb4',
-            }
+    DB_ENGINE = DATABASES['default']['ENGINE']
 else:
     DB_ENGINE = os.environ.get('DB_ENGINE', 'django.db.backends.mysql')
     if DB_ENGINE == 'django.db.backends.sqlite3':
@@ -307,7 +304,7 @@ CACHES = {
         'KEY_PREFIX': 'miracommerce',
     }
 }
-if not DEBUG and DB_ENGINE != 'django.db.backends.sqlite3' and not DATABASES['default'].get('PASSWORD'):
+if not DEBUG and 'sqlite' not in DB_ENGINE and not DATABASES['default'].get('PASSWORD'):
     raise ImproperlyConfigured('DB_PASSWORD deve ser definida em produção.')
 
 if not DEBUG and MEDIA_STORAGE_BACKEND != 'django.core.files.storage.FileSystemStorage':
