@@ -3,7 +3,16 @@
 .fas, .far, .fab { display: inline-block; min-width: 1em; text-align: center; }
 .fa-bars::before { content: "☰"; }
 .fa-dot-circle::before { content: "•"; }
-.fa-power-off::before { content: "⏻"; }
+.fa-power-off {
+    display: inline-block;
+    width: 1.1em;
+    height: 1.1em;
+    background-color: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18.36 6.64a9 9 0 1 1-12.73 0'%3E%3C/path%3E%3Cline x1='12' y1='2' x2='12' y2='12'%3E%3C/line%3E%3C/svg%3E") no-repeat center / contain;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18.36 6.64a9 9 0 1 1-12.73 0'%3E%3C/path%3E%3Cline x1='12' y1='2' x2='12' y2='12'%3E%3C/line%3E%3C/svg%3E") no-repeat center / contain;
+    vertical-align: -0.18em;
+}
+.fa-power-off::before { content: "" !important; }
 .fa-shopping-cart::before, .fa-shopping-basket::before, .fa-cart-plus::before { content: "🛒"; }
 .fa-user-shield::before, .fa-user-circle::before, .fa-user-lock::before { content: "👤"; }
 .fa-star::before { content: "★"; }
