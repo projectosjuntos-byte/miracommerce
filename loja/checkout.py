@@ -17,10 +17,25 @@ def calcular_bonus_compra(total_venda):
     return (Decimal(str(total_venda)) * Decimal('0.05')).quantize(Decimal('0.01'))
 
 
-def calcular_frete(subtotal):
-    if subtotal >= settings.FRETE_GRATIS_MINIMO:
+def calcular_frete(subtotal, zona=None):
+    """Calcula o frete baseado na zona de entrega selecionada.
+    
+    Se uma zona for informada (objeto ou id), aplica a taxa cadastrada.
+    Caso contrário, utiliza o frete padrão configurado no sistema.
+    """
+    from .models import ZonaEntrega
+
+    if zona:
+        if isinstance(zona, (int, str)) and str(zona).isdigit():
+            zona = ZonaEntrega.objects.filter(id=int(zona), ativo=True).first()
+        if hasattr(zona, 'taxa'):
+            return Decimal(str(zona.taxa))
+
+    minimo_gratis = getattr(settings, 'FRETE_GRATIS_MINIMO', None)
+    if minimo_gratis is not None and subtotal >= minimo_gratis:
         return Decimal('0.00')
-    return settings.FRETE_PADRAO
+
+    return getattr(settings, 'FRETE_PADRAO', Decimal('0.00'))
 
 
 def carregar_itens_carrinho(carrinho):
@@ -72,7 +87,7 @@ def observe_checkout(func):
 
 @observe_checkout
 @transaction.atomic
-def processar_finalizacao_compra(usuario, carrinho, idempotency_key=None):
+def processar_finalizacao_compra(usuario, carrinho, zona_id=None, endereco_entrega=None, idempotency_key=None):
     """Processa um checkout interno de forma transacional e idempotente."""
     if not carrinho:
         return Decimal('0.00'), Decimal('0.00')
@@ -87,7 +102,7 @@ def processar_finalizacao_compra(usuario, carrinho, idempotency_key=None):
     elif not isinstance(idempotency_key, UUID):
         idempotency_key = UUID(str(idempotency_key))
 
-    # Serializa checkouts do mesmo cliente e impede duplo clique/concor­rência.
+    # Serializa checkouts do mesmo cliente e impede duplo clique/concorrência.
     usuario = get_user_model().objects.select_for_update().get(pk=usuario.pk)
     pedido_existente = Pedido.objects.filter(idempotency_key=idempotency_key).first()
     if pedido_existente:
@@ -136,7 +151,12 @@ def processar_finalizacao_compra(usuario, carrinho, idempotency_key=None):
         for produto, qtd, preco_venda in itens_para_processar:
             subtotal_venda += preco_venda * qtd
 
-        frete = calcular_frete(subtotal_venda)
+        from .models import ZonaEntrega
+        zona = None
+        if zona_id:
+            zona = ZonaEntrega.objects.filter(id=zona_id, ativo=True).first()
+
+        frete = calcular_frete(subtotal_venda, zona=zona)
         total_venda = subtotal_venda + frete
 
         pedido = Pedido(
@@ -144,6 +164,8 @@ def processar_finalizacao_compra(usuario, carrinho, idempotency_key=None):
             subtotal=subtotal_venda,
             frete=frete,
             total=total_venda,
+            zona_entrega=zona,
+            endereco_entrega=endereco_entrega or '',
             finalizado=True,
             status=Pedido.Status.PAID,
             idempotency_key=idempotency_key,

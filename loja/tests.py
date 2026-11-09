@@ -28,6 +28,7 @@ from .models import (
     Produto,
     SubCategoria,
     Venda,
+    ZonaEntrega,
 )
 from .checkout import processar_finalizacao_compra
 from .recomendacoes import gerar_regras_associacao
@@ -98,7 +99,8 @@ class ProdutoBusinessLogicTests(TestCase):
         pedido = Pedido.objects.get(usuario=self.user)
         item = ItemPedido.objects.get(pedido=pedido, produto=self.produto)
         self.assertTrue(pedido.finalizado)
-        self.assertEqual(pedido.total, Decimal('160.00'))
+        self.assertEqual(pedido.subtotal, Decimal('160.00'))
+        self.assertEqual(pedido.total, Decimal('160.00') + pedido.frete)
         self.assertEqual(item.preco_unitario, Decimal('80.00'))
         self.assertEqual(item.subtotal, Decimal('160.00'))
         perfil = Perfil.objects.get(usuario=self.user)
@@ -1359,4 +1361,81 @@ class VitrineFiltrosEOrdenacaoTests(TestCase):
         self.assertEqual(len(response.context['produtos']), 0)
         self.assertContains(response, 'Nenhum produto encontrado')
         self.assertContains(response, 'Limpar Filtros e Ver Todos')
+
+
+class ZonaEntregaTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(
+            username='cliente_entrega',
+            email='cliente@exemplo.com',
+            password='senha-forte-123',
+        )
+        self.produto = Produto.objects.create(
+            nome='Arroz 5kg',
+            preco=Decimal('5000.00'),
+            quantidade_estoque=10,
+            data_validade=date.today() + timedelta(days=365),
+        )
+        self.client.force_login(self.user)
+
+    def test_zonas_padrao_carregadas_e_ordenadas(self):
+        zonas = list(ZonaEntrega.objects.filter(ativo=True).order_by('ordem'))
+        self.assertGreaterEqual(len(zonas), 3)
+        self.assertEqual(zonas[0].taxa, Decimal('4000.00'))
+        self.assertEqual(zonas[1].taxa, Decimal('2500.00'))
+        self.assertEqual(zonas[2].taxa, Decimal('1500.00'))
+
+    def test_carrinho_exibe_seletor_de_zonas(self):
+        session = self.client.session
+        session['carrinho'] = {str(self.produto.id): 1}
+        session.save()
+
+        response = self.client.get(reverse('exibir_carrinho'))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('zonas_disponiveis', response.context)
+        self.assertIn('zona_selecionada', response.context)
+        self.assertContains(response, 'id="zona-entrega-select"')
+        self.assertContains(response, 'Zona 1')
+
+    def test_endpoint_ajax_definir_zona_entrega(self):
+        session = self.client.session
+        session['carrinho'] = {str(self.produto.id): 1}
+        session.save()
+
+        zona2 = ZonaEntrega.objects.filter(taxa=Decimal('2500.00')).first()
+        self.assertIsNotNone(zona2)
+
+        response = self.client.post(
+            reverse('definir_zona_entrega'),
+            {'zona_id': zona2.id},
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
+        self.assertEqual(response.status_code, 200)
+        dados = response.json()
+        self.assertTrue(dados['ok'])
+        self.assertEqual(dados['frete'], '2500.00')
+        self.assertEqual(dados['total'], '7500.00')
+        self.assertEqual(self.client.session.get('zona_entrega_id'), zona2.id)
+
+    def test_finalizar_compra_grava_zona_e_endereco_no_pedido(self):
+        session = self.client.session
+        session['carrinho'] = {str(self.produto.id): 1}
+        session.save()
+
+        zona3 = ZonaEntrega.objects.filter(taxa=Decimal('1500.00')).first()
+        carrinho_response = self.client.get(reverse('exibir_carrinho'))
+        key = carrinho_response.context['checkout_idempotency_key']
+
+        response = self.client.post(reverse('finalizar_compra'), {
+            'idempotency_key': key,
+            'zona_entrega_id': zona3.id,
+            'endereco_entrega': 'Mutamba, Rua da Alfândega, Prédio 4, Apt 2',
+        })
+        self.assertEqual(response.status_code, 302)
+
+        pedido = Pedido.objects.filter(usuario=self.user).latest('data_criacao')
+        self.assertEqual(pedido.zona_entrega, zona3)
+        self.assertEqual(pedido.frete, Decimal('1500.00'))
+        self.assertEqual(pedido.total, Decimal('6500.00'))
+        self.assertIn('Mutamba', pedido.endereco_entrega)
 

@@ -21,7 +21,7 @@ from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
 
 # Importações locais
-from .models import Pedido, Produto, Venda, Perfil, Categoria, SubCategoria
+from .models import Pedido, Produto, Venda, Perfil, Categoria, SubCategoria, ZonaEntrega
 from .forms import CadastroForm, DefinicoesForm
 from .tasks import enqueue_recommendation_refresh
 from .privacy import anonimizar_usuario, exportar_dados_usuario
@@ -444,7 +444,18 @@ def home(request, categoria_id=None, subcategoria_id=None):
 # --- 2. GESTÃO DO CARRINHO ---
 def exibir_carrinho(request):
     carrinho = request.session.get('carrinho', {})
-    resumo = CarrinhoService.carregar(carrinho)
+
+    # Carregar zonas ativas para seleção de entrega
+    zonas_disponiveis = list(ZonaEntrega.objects.filter(ativo=True).order_by('ordem', 'taxa', 'nome'))
+    zona_id_sessao = request.session.get('zona_entrega_id')
+    zona_selecionada = None
+    if zona_id_sessao:
+        zona_selecionada = next((z for z in zonas_disponiveis if str(z.id) == str(zona_id_sessao)), None)
+    if not zona_selecionada and zonas_disponiveis:
+        zona_selecionada = zonas_disponiveis[0]
+        request.session['zona_entrega_id'] = zona_selecionada.id
+
+    resumo = CarrinhoService.carregar(carrinho, zona=zona_selecionada)
     itens = resumo['itens']
     subtotal = resumo['subtotal']
     frete = resumo['frete']
@@ -466,11 +477,36 @@ def exibir_carrinho(request):
         'subtotal': subtotal,
         'frete': frete,
         'total': total,
+        'zonas_disponiveis': zonas_disponiveis,
+        'zona_selecionada': zona_selecionada,
         'saldo_bonus': saldo_bonus,
         'sugestoes_ia': sugestoes_ia,
         # A chave nasce antes do POST e pertence à versão atual do carrinho.
         # Assim, abas e cliques concorrentes usam a mesma operação.
         'checkout_idempotency_key': _obter_chave_checkout(request) if itens else None,
+    })
+
+@require_POST
+def definir_zona_entrega(request):
+    zona_id = request.POST.get('zona_id')
+    zona = ZonaEntrega.objects.filter(id=zona_id, ativo=True).first()
+    if not zona:
+        return JsonResponse({'ok': False, 'message': 'Zona de entrega não encontrada.'}, status=400)
+
+    request.session['zona_entrega_id'] = zona.id
+    carrinho = request.session.get('carrinho', {})
+    resumo = CarrinhoService.carregar(carrinho, zona=zona)
+
+    return JsonResponse({
+        'ok': True,
+        'zona_id': zona.id,
+        'zona_nome': zona.nome,
+        'taxa': f"{zona.taxa:.2f}",
+        'subtotal': f"{resumo['subtotal']:.2f}",
+        'frete': f"{resumo['frete']:.2f}",
+        'total': f"{resumo['total']:.2f}",
+        'prazo_estimado': zona.prazo_estimado,
+        'descricao': zona.descricao,
     })
 
 @require_POST
@@ -520,7 +556,9 @@ def editar_carrinho(request, produto_id, acao):
     )
 
     if is_ajax:
-        resumo = CarrinhoService.carregar(carrinho)
+        zona_id = request.session.get('zona_entrega_id')
+        zona = ZonaEntrega.objects.filter(id=zona_id, ativo=True).first() if zona_id else None
+        resumo = CarrinhoService.carregar(carrinho, zona=zona)
         itens = resumo['itens']
         subtotal = resumo['subtotal']
         frete = resumo['frete']
@@ -572,10 +610,15 @@ def processar_finalizacao_compra(request):
         messages.error(request, 'O cesto foi atualizado. Revise-o antes de finalizar a compra.')
         return redirect('exibir_carrinho')
 
+    zona_id = request.POST.get('zona_entrega_id') or request.session.get('zona_entrega_id')
+    endereco_entrega = request.POST.get('endereco_entrega', '').strip()
+
     try:
         total_venda, _ = PedidoService.finalizar(
             request.user,
             carrinho,
+            zona_id=zona_id,
+            endereco_entrega=endereco_entrega,
             idempotency_key=idempotency_key,
         )
     except ValueError as exc:
@@ -584,6 +627,7 @@ def processar_finalizacao_compra(request):
 
     request.session['carrinho'] = {}
     request.session.pop(CHECKOUT_IDEMPOTENCY_SESSION_KEY, None)
+    request.session.pop('zona_entrega_id', None)
     messages.success(request, "Compra finalizada com sucesso! Acompanhe o status do seu pedido abaixo.")
     pedido_recente = Pedido.objects.filter(usuario=request.user, idempotency_key=idempotency_key).first()
     if pedido_recente:

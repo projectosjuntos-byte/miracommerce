@@ -22,18 +22,20 @@ document.addEventListener('DOMContentLoaded', function () {
         const shipping = document.querySelector('[data-cart-shipping]');
         const total = document.querySelector('[data-cart-total]');
         const cartCount = document.getElementById('cart-count');
+        const cartCountMobile = document.getElementById('cart-count-mobile');
         const lineCount = document.querySelector('[data-cart-line-count]');
 
-        if (productsCount) productsCount.textContent = data.line_count;
-        if (subtotal) subtotal.textContent = formatCurrency(data.subtotal);
-        if (shipping) {
+        if (productsCount && data.line_count !== undefined) productsCount.textContent = data.line_count;
+        if (subtotal && data.subtotal !== undefined) subtotal.textContent = formatCurrency(data.subtotal);
+        if (shipping && data.frete !== undefined) {
             const hasShipping = Number(data.frete) > 0;
             shipping.textContent = hasShipping ? formatCurrency(data.frete) : 'Grátis';
             shipping.classList.toggle('text-success', !hasShipping);
         }
-        if (total) total.textContent = formatCurrency(data.total);
-        if (cartCount) cartCount.textContent = data.total_itens;
-        if (lineCount) {
+        if (total && data.total !== undefined) total.textContent = formatCurrency(data.total);
+        if (cartCount && data.total_itens !== undefined) cartCount.textContent = data.total_itens;
+        if (cartCountMobile && data.total_itens !== undefined) cartCountMobile.textContent = data.total_itens;
+        if (lineCount && data.line_count !== undefined) {
             lineCount.textContent = `${data.line_count} produto${data.line_count === 1 ? '' : 's'}`;
         }
     };
@@ -99,4 +101,61 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+
+    // Seletor dinâmico de Zona de Entrega
+    const zonaSelect = document.getElementById('zona-entrega-select');
+    if (zonaSelect) {
+        zonaSelect.addEventListener('change', async function () {
+            const zonaId = this.value;
+            const url = this.dataset.url;
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+            const hiddenZonaId = document.getElementById('hidden-zona-entrega-id');
+            const prazoBadge = document.getElementById('zona-prazo-badge');
+            const descWrapper = document.getElementById('zona-descricao-wrapper');
+            const descText = document.getElementById('zona-descricao-text');
+
+            if (hiddenZonaId) hiddenZonaId.value = zonaId;
+
+            const selectedOpt = this.options[this.selectedIndex];
+            if (selectedOpt && prazoBadge) {
+                prazoBadge.textContent = selectedOpt.dataset.prazo || 'Até 24h';
+            }
+            if (selectedOpt && descWrapper && descText) {
+                const desc = selectedOpt.dataset.desc;
+                if (desc) {
+                    const span = descText.querySelector('span');
+                    if (span) span.textContent = desc;
+                    descWrapper.classList.remove('d-none');
+                } else {
+                    descWrapper.classList.add('d-none');
+                }
+            }
+
+            if (!url || !zonaId) return;
+
+            try {
+                const formData = new FormData();
+                formData.append('zona_id', zonaId);
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': csrfToken,
+                    },
+                    body: formData,
+                    credentials: 'same-origin',
+                });
+
+                if (!response.ok) throw new Error('Não foi possível atualizar a taxa de entrega.');
+                const data = await response.json();
+                if (data.ok) {
+                    updateSummary(data);
+                    setFeedback(`Zona de entrega atualizada: ${data.zona_nome}`);
+                }
+            } catch (error) {
+                setFeedback(error.message || 'Erro ao calcular taxa de entrega.');
+            }
+        });
+    }
 });

@@ -724,6 +724,35 @@
           <i class="fas fa-receipt summary-icon" aria-hidden="true"></i>
         </div>
         <div class="summary-note"><i class="fas fa-shield-alt me-2" aria-hidden="true"></i>Valores atualizados para esta sessão.</div>
+
+        <!-- Seletor de Zona de Entrega -->
+        <div class="cart-zone-selector mb-3 p-3 rounded-3" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <label for="zona-entrega-select" class="form-label small fw-bold mb-0 text-white">
+              <i class="fas fa-truck-fast text-warning me-1"></i> Zona de Entrega
+            </label>
+            <span class="badge bg-warning text-dark px-2 py-1" id="zona-prazo-badge" style="font-size: 0.70rem; font-weight: 700;">
+              {{ zona_selecionada.prazo_estimado|default:"Até 24h" }}
+            </span>
+          </div>
+
+          <select id="zona-entrega-select" class="form-select form-select-sm text-white" style="background-color: #212529; border-color: rgba(255, 255, 255, 0.2);" data-url="{% url 'definir_zona_entrega' %}">
+            {% for zona in zonas_disponiveis %}
+              <option value="{{ zona.id }}" data-taxa="{{ zona.taxa }}" data-prazo="{{ zona.prazo_estimado }}" data-desc="{{ zona.descricao }}" {% if zona_selecionada and zona_selecionada.id == zona.id %}selected{% endif %}>
+                {{ zona.nome }} ({{ zona.taxa|floatformat:2 }} Kz)
+              </option>
+            {% empty %}
+              <option value="">Entrega Padrão ({{ frete|floatformat:2 }} Kz)</option>
+            {% endfor %}
+          </select>
+
+          <div id="zona-descricao-wrapper" class="mt-2 {% if not zona_selecionada.descricao %}d-none{% endif %}">
+            <small class="text-white-50 d-block lh-sm" id="zona-descricao-text" style="font-size: 0.78rem;">
+              <i class="fas fa-map-marker-alt text-warning me-1"></i><span>{{ zona_selecionada.descricao|default:"" }}</span>
+            </small>
+          </div>
+        </div>
+
         <div class="d-flex justify-content-between mb-3 opacity-75">
           <span>Produtos</span>
           <span class="fw-bold" data-cart-products-count>{{ itens|length }}</span>
@@ -733,7 +762,7 @@
           <span class="fw-bold" data-cart-subtotal>{{ subtotal|floatformat:2 }} Kz</span>
         </div>
         <div class="d-flex justify-content-between mb-3 opacity-75">
-          <span>Entrega:</span>
+          <span>Taxa de Entrega:</span>
           {% if frete %}
             <span class="fw-bold" data-cart-shipping>{{ frete|floatformat:2 }} Kz</span>
           {% else %}
@@ -749,6 +778,15 @@
         <form id="checkout-form" action="{% url 'finalizar_compra' %}" method="post">
           {% csrf_token %}
           <input type="hidden" name="idempotency_key" value="{{ checkout_idempotency_key }}">
+          <input type="hidden" name="zona_entrega_id" id="hidden-zona-entrega-id" value="{{ zona_selecionada.id|default:'' }}">
+
+          <div class="mb-3 text-start">
+            <label for="endereco_entrega_input" class="form-label small text-white-50 mb-1">
+              <i class="fas fa-location-dot me-1 text-warning"></i> Endereço / Ponto de Referência
+            </label>
+            <input type="text" name="endereco_entrega" id="endereco_entrega_input" class="form-control form-control-sm text-white" style="background-color: #212529; border-color: rgba(255, 255, 255, 0.2);" placeholder="Ex: Talatona, Rua Direita, Casa 12" />
+          </div>
+
           <button type="submit" class="btn btn-checkout btn-lg w-100 rounded-pill text-white mb-3" id="finalizar-btn">
             Finalizar compra <i class="fas fa-rocket ms-2" aria-hidden="true"></i>
           </button>

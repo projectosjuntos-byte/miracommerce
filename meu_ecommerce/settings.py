@@ -81,7 +81,7 @@ if _env_bool('VERCEL', False) or not REDIS_URL:
 else:
     USE_REDIS_CACHE = _env_bool('USE_REDIS_CACHE', not DEBUG)
 METRICS_TOKEN = os.environ.get('METRICS_TOKEN', '').strip()
-TRUST_PROXY_HEADERS = _env_bool('TRUST_PROXY_HEADERS', True)
+TRUST_PROXY_HEADERS = _env_bool('TRUST_PROXY_HEADERS', _env_bool('VERCEL', False))
 
 INSTALLED_APPS = [
     'simpleui',
@@ -364,6 +364,7 @@ SIMPLEUI_ICON = {
     'Movimentacao estoques': 'fas fa-warehouse',
     'Historico status pedidos': 'fas fa-timeline',
     'Auditoria administrativas': 'fas fa-shield-halved',
+    'Zonas de entrega': 'fas fa-map-location-dot',
 }
 
 # Em desenvolvimento ou sem credenciais SMTP, exibe os e-mails no console.

@@ -39,9 +39,9 @@ class CarrinhoService:
     """Leitura do carrinho e composição do resumo exibido ao cliente."""
 
     @staticmethod
-    def carregar(carrinho):
+    def carregar(carrinho, zona=None):
         itens, subtotal = carregar_itens_carrinho(carrinho)
-        frete = calcular_frete(subtotal)
+        frete = calcular_frete(subtotal, zona=zona)
         return {
             'itens': itens,
             'subtotal': subtotal,
@@ -54,16 +54,28 @@ class PedidoService:
     """Orquestração de pedidos, sem depender da camada HTTP."""
 
     @staticmethod
-    def finalizar(usuario, carrinho, idempotency_key=None):
-        return processar_finalizacao_compra(usuario, carrinho, idempotency_key=idempotency_key)
+    def finalizar(usuario, carrinho, zona_id=None, endereco_entrega=None, idempotency_key=None):
+        return processar_finalizacao_compra(
+            usuario,
+            carrinho,
+            zona_id=zona_id,
+            endereco_entrega=endereco_entrega,
+            idempotency_key=idempotency_key,
+        )
 
 
 class PagamentoService:
     """Ponto de entrada para o pagamento atual e futuros gateways."""
 
     @staticmethod
-    def confirmar_pedido(usuario, carrinho, idempotency_key=None):
-        return PedidoService.finalizar(usuario, carrinho, idempotency_key=idempotency_key)
+    def confirmar_pedido(usuario, carrinho, zona_id=None, endereco_entrega=None, idempotency_key=None):
+        return PedidoService.finalizar(
+            usuario,
+            carrinho,
+            zona_id=zona_id,
+            endereco_entrega=endereco_entrega,
+            idempotency_key=idempotency_key,
+        )
 
 
 class RecomendacaoService:

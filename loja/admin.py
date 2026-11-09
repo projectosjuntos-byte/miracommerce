@@ -15,6 +15,7 @@ from .models import (
     Produto,
     SubCategoria,
     Venda,
+    ZonaEntrega,
 )
 
 # ==============================================================================
@@ -180,13 +181,39 @@ class ItemPedidoInline(admin.TabularInline):
     def has_add_permission(self, request, obj=None):
         return False
 
+# ==============================================================================
+# 4.5. ZONAS DE ENTREGA (GESTÃO DE FRETE)
+# ==============================================================================
+@admin.register(ZonaEntrega)
+class ZonaEntregaAdmin(AuditedModelAdmin):
+    list_display = ('nome', 'taxa_formatada', 'prazo_estimado', 'ativo', 'ordem')
+    list_display_links = ('nome',)
+    list_editable = ('ativo', 'ordem')
+    list_filter = ('ativo',)
+    search_fields = ('nome', 'descricao')
+    ordering = ('ordem', 'taxa', 'nome')
+    fieldsets = (
+        ('Identificação da Zona', {
+            'fields': ('nome', 'taxa', 'prazo_estimado', 'ativo', 'ordem')
+        }),
+        ('Abrangência e Detalhes', {
+            'fields': ('descricao',),
+            'description': 'Especifique os bairros, comunas ou municípios atendidos nesta faixa tarifária.'
+        }),
+    )
+
+    def taxa_formatada(self, obj):
+        return f"{obj.taxa:,.2f} Kz".replace(',', 'X').replace('.', ',').replace('X', '.')
+    taxa_formatada.short_description = 'Taxa de Entrega'
+
+
 @admin.register(Pedido)
 class PedidoAdmin(AuditedModelAdmin):
-    list_display = ('id', 'usuario', 'data_criacao', 'exibir_status', 'total', 'exibir_finalizado')
-    list_filter = ('status', 'finalizado', 'data_criacao')
-    search_fields = ('id', 'usuario__username', 'usuario__email')
+    list_display = ('id', 'usuario', 'zona_entrega', 'data_criacao', 'exibir_status', 'total', 'exibir_finalizado')
+    list_filter = ('status', 'zona_entrega', 'finalizado', 'data_criacao')
+    search_fields = ('id', 'usuario__username', 'usuario__email', 'endereco_entrega')
     inlines = [ItemPedidoInline]
-    readonly_fields = ('usuario', 'data_criacao', 'finalizado', 'total', 'idempotency_key')
+    readonly_fields = ('usuario', 'data_criacao', 'finalizado', 'total', 'frete', 'subtotal', 'zona_entrega', 'endereco_entrega', 'idempotency_key')
     actions = ['marcar_como_preparacao', 'marcar_como_transporte', 'marcar_como_entregue']
 
     def save_model(self, request, obj, form, change):

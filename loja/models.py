@@ -209,6 +209,24 @@ class Venda(models.Model):
     def __str__(self):
         return f"Venda {self.id_transacao} - {self.produto.nome}"
 
+# 4.5. ZONAS DE ENTREGA (Frete configurável pelo administrador)
+class ZonaEntrega(models.Model):
+    nome = models.CharField(max_length=120, help_text="Nome da zona (ex: Zona 1 - Cacuaco e Viana)")
+    taxa = models.DecimalField(max_digits=10, decimal_places=2, help_text="Taxa de entrega em Kwanzas (Kz)")
+    descricao = models.CharField(max_length=255, blank=True, help_text="Bairros e municípios atendidos nesta zona")
+    prazo_estimado = models.CharField(max_length=100, blank=True, default="No mesmo dia ou até 24h", help_text="Prazo estimado de entrega")
+    ativo = models.BooleanField(default=True, help_text="Marque para manter esta zona ativa para escolha dos clientes")
+    ordem = models.PositiveIntegerField(default=0, help_text="Ordem de exibição na lista (menor número aparece primeiro)")
+
+    class Meta:
+        verbose_name = "Zona de Entrega"
+        verbose_name_plural = "Zonas de Entrega"
+        ordering = ['ordem', 'taxa', 'nome']
+
+    def __str__(self):
+        return f"{self.nome} ({self.taxa:,.2f} Kz)".replace(',', 'X').replace('.', ',').replace('X', '.')
+
+
 # 5. ESTRUTURA DE PEDIDOS (Para o processo de checkout)
 class Pedido(models.Model):
     class Status(models.TextChoices):
@@ -227,6 +245,20 @@ class Pedido(models.Model):
     subtotal = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
     frete = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
     total = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
+    zona_entrega = models.ForeignKey(
+        'ZonaEntrega',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='pedidos',
+        verbose_name="Zona de Entrega",
+    )
+    endereco_entrega = models.CharField(
+        max_length=255,
+        blank=True,
+        default='',
+        verbose_name="Endereço / Ponto de Referência",
+    )
     status = models.CharField(
         max_length=20,
         choices=Status.choices,

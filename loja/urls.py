@@ -32,6 +32,7 @@ urlpatterns = [
 
     # --- Gestão do Carrinho ---
     path('carrinho/', views.exibir_carrinho, name='exibir_carrinho'),
+    path('carrinho/definir-zona/', views.definir_zona_entrega, name='definir_zona_entrega'),
     path('carrinho/add/<int:produto_id>/', views.adicionar_ao_carrinho, name='adicionar_ao_carrinho'),
     path('carrinho/remover/<int:produto_id>/', views.remover_do_carrinho, name='remover_do_carrinho'),
     path('carrinho/editar/<int:produto_id>/<str:acao>/', views.editar_carrinho, name='editar_carrinho'),

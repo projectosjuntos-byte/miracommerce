@@ -696,11 +696,21 @@
             <!-- Endereço de Entrega -->
             <section class="detail-card">
                 <h2 class="detail-card-title">
-                    <i class="fas fa-location-dot text-warning" aria-hidden="true"></i>
+                    <i class="fas fa-truck-fast text-warning" aria-hidden="true"></i>
                     Dados de Entrega
                 </h2>
 
                 <p class="mb-1 fw-bold">{{ pedido.usuario.get_full_name|default:pedido.usuario.username }}</p>
+                {% if pedido.zona_entrega %}
+                    <p class="mb-1 text-warning fw-semibold small">
+                        <i class="fas fa-map-location-dot me-1"></i> {{ pedido.zona_entrega.nome }} ({{ pedido.zona_entrega.prazo_estimado }})
+                    </p>
+                {% endif %}
+                {% if pedido.endereco_entrega %}
+                    <p class="mb-2 text-muted small">
+                        <i class="fas fa-map-pin me-1"></i> <strong>Referência:</strong> {{ pedido.endereco_entrega }}
+                    </p>
+                {% endif %}
                 {% if perfil %}
                     {% if perfil.bairro or perfil.municipio or perfil.provincia %}
                         <p class="mb-1 text-muted small">
