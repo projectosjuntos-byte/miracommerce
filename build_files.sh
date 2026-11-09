@@ -21,6 +21,12 @@ fi
 echo "==> [Vercel Build] 2/3 - Coletando arquivos estaticos para Edge CDN..."
 $PYTHON_CMD manage.py collectstatic --noinput --clear
 
+echo "==> [Vercel Build] 2.1/3 - Copiando fotos de produtos de media/ para staticfiles/media/..."
+mkdir -p staticfiles/media
+if [ -d "media" ]; then
+    cp -r media/* staticfiles/media/ 2>/dev/null || true
+fi
+
 echo "==> [Vercel Build] 3/3 - Verificando migracoes do banco de dados..."
 if [ -n "$DATABASE_URL" ] || [ -n "$DB_HOST" ]; then
     echo "==> Aplicando migracoes no banco remoto..."

@@ -453,3 +453,164 @@
 .btn-clear-all-filters:hover {
     color: #ef4444;
 }
+
+/* ------------------------------------------------------------------------------
+   5. RESPONSIVIDADE EXCLUSIVA DO CARD DE FILTROS PARA MOBILE
+   ------------------------------------------------------------------------------ */
+@media (max-width: 991.98px) {
+    .catalog-controls-card {
+        padding: 1rem 1.15rem;
+    }
+
+    .controls-main-row {
+        gap: 1rem 1.25rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .catalog-controls-card {
+        padding: 0.95rem 0.9rem;
+        border-radius: 12px;
+        margin-bottom: 1.25rem;
+    }
+
+    .controls-main-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.85rem;
+    }
+
+    .control-group {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.35rem;
+    }
+
+    .control-group .control-label {
+        font-size: 0.82rem;
+        margin-bottom: 0.15rem;
+    }
+
+    .catalog-select {
+        width: 100%;
+        min-height: 42px;
+        font-size: 0.9rem;
+        padding: 0.5rem 0.85rem;
+    }
+
+    .price-inputs-wrapper {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        gap: 0.4rem;
+    }
+
+    .price-inputs-wrapper .catalog-input {
+        flex: 1 1 0;
+        min-width: 0;
+        width: 100%;
+        min-height: 42px;
+        font-size: 0.88rem;
+        padding: 0.45rem 0.5rem;
+    }
+
+    .price-separator {
+        padding: 0 0.15rem;
+        font-weight: 700;
+        color: var(--mira-muted);
+    }
+
+    .btn-filter-apply {
+        min-height: 42px;
+        padding: 0 1rem;
+        flex-shrink: 0;
+        font-size: 0.85rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .control-group.promo-group {
+        padding-top: 0.15rem;
+    }
+
+    .promo-checkbox-label {
+        width: 100%;
+        justify-content: center;
+        min-height: 42px;
+        padding: 0.5rem 1rem;
+    }
+
+    .promo-badge-text {
+        font-size: 0.88rem;
+    }
+
+    .price-presets-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+    }
+
+    .presets-label {
+        font-size: 0.74rem;
+    }
+
+    .presets-chips {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+    }
+
+    .preset-chip {
+        padding: 0.35rem 0.75rem;
+        font-size: 0.78rem;
+        text-align: center;
+    }
+
+    .active-filters-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        margin-top: 0.65rem;
+        padding-top: 0.65rem;
+    }
+
+    .active-filters-chips {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+    }
+
+    .active-filter-tag {
+        padding: 0.3rem 0.7rem;
+        font-size: 0.78rem;
+    }
+
+    .btn-clear-all-filters {
+        display: inline-block;
+        margin-left: 0;
+        margin-top: 0.35rem;
+        padding: 0.25rem 0;
+        font-size: 0.78rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .catalog-controls-card {
+        padding: 0.85rem 0.75rem;
+    }
+
+    .price-inputs-wrapper {
+        gap: 0.3rem;
+    }
+
+    .btn-filter-apply {
+        padding: 0 0.75rem;
+    }
+}

@@ -1,0 +1,331 @@
+/* ==============================================================================
+   MIRACOMERCE - REALCE DE CONTRASTE NO MODO ESCURO NA ÁREA ADMIN (SIMPLEUI & DJANGO ADMIN)
+   Garante legibilidade cristalina, tipografia nítida e alto contraste em todos os
+   textos, rótulos, tabelas, campos e menus no modo escuro.
+   ============================================================================== */
+
+@media (prefers-color-scheme: dark), (forced-colors: active) {
+    /* 1. VARIÁVEIS GLOBAIS DE CONTRASTE NO MODO ESCURO */
+    :root {
+        --body-fg: #f8fafc !important;
+        --body-quiet-color: #cbd5e1 !important;
+        --body-loud-color: #ffffff !important;
+        --header-color: #ffffff !important;
+        --header-link-color: #93c5fd !important;
+        --breadcrumbs-fg: #f1f5f9 !important;
+        --breadcrumbs-link-fg: #60a5fa !important;
+        --link-fg: #60a5fa !important;
+        --link-hover-color: #93c5fd !important;
+        --border-color: #334155 !important;
+        --hairline-color: #334155 !important;
+    }
+
+    body, html {
+        color: #f8fafc !important;
+    }
+
+    /* 2. RÓTULOS, LABELS E TÍTULOS DE FORMULÁRIOS */
+    label,
+    .form-row label,
+    .field-box label,
+    .aligned label,
+    .inline-group label,
+    .module label,
+    .el-form-item__label,
+    .control-label {
+        color: #ffffff !important;
+        font-weight: 600 !important;
+        font-size: 0.92rem !important;
+        letter-spacing: 0.01em !important;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+    }
+
+    /* 3. TÍTULOS DE SEÇÕES, MÓDULOS E CARDS */
+    h1, h2, h3, h4, h5, h6,
+    .module h2,
+    .module caption,
+    .inline-group h2,
+    .selector-chosen h2,
+    .page-header h1,
+    .page-header h2,
+    .box-card .clearfix,
+    .el-card__header,
+    .el-card__header span {
+        color: #ffffff !important;
+        font-weight: 700 !important;
+        letter-spacing: -0.01em !important;
+    }
+
+    #content-main .module,
+    #content-main .page-header,
+    #content-main .submit-row {
+        background-color: #1e2433 !important;
+        border: 1px solid #334155 !important;
+    }
+
+    .module h2,
+    .module caption,
+    .inline-group h2,
+    .selector-chosen h2 {
+        background-color: #182030 !important;
+        border-bottom: 1px solid #334155 !important;
+    }
+
+    /* 4. TEXTOS DE AJUDA, SUBTÍTULOS E AVISOS */
+    .help,
+    p.help,
+    .form-row .help,
+    .help-block,
+    .help-tooltip,
+    span.help,
+    .quiet,
+    .text-muted,
+    div.help {
+        color: #cbd5e1 !important;
+        font-weight: 500 !important;
+        font-size: 0.85rem !important;
+        line-height: 1.4 !important;
+    }
+
+    /* 5. TABELAS (CHANGELISTS, ITENS, RESULTADOS) */
+    table thead th,
+    table th,
+    .el-table th,
+    #result_list th,
+    #result_list th a,
+    .change-list th,
+    th.sortable a {
+        color: #ffffff !important;
+        background-color: #1e293b !important;
+        font-weight: 700 !important;
+        font-size: 0.9rem !important;
+        border-bottom: 2px solid #475569 !important;
+        letter-spacing: 0.02em !important;
+    }
+
+    table tbody td,
+    table td,
+    .el-table td,
+    #result_list td,
+    #result_list tbody th,
+    .results {
+        color: #f1f5f9 !important;
+        font-size: 0.92rem !important;
+        border-bottom: 1px solid #334155 !important;
+    }
+
+    tbody a:link,
+    tbody a:visited,
+    #result_list tbody th a,
+    #result_list tbody td a,
+    td a {
+        color: #60a5fa !important;
+        font-weight: 600 !important;
+    }
+
+    tbody a:hover,
+    #result_list tbody th a:hover,
+    #result_list tbody td a:hover,
+    td a:hover {
+        color: #93c5fd !important;
+        text-decoration: underline !important;
+    }
+
+    tbody tr:hover td,
+    tbody tr:hover th,
+    .el-table__body tr.hover-row > td {
+        background-color: rgba(59, 130, 246, 0.15) !important;
+    }
+
+    /* 6. CAMPOS DE FORMULÁRIO (INPUTS, SELECTS, TEXTAREAS) */
+    input[type="text"],
+    input[type="password"],
+    input[type="email"],
+    input[type="url"],
+    input[type="number"],
+    input[type="tel"],
+    textarea,
+    select,
+    .vTextField,
+    .vIntegerField,
+    .vForeignKeyRawIdAdminField,
+    .el-input__inner,
+    .el-textarea__inner {
+        background-color: #0f172a !important;
+        color: #ffffff !important;
+        border: 1px solid #475569 !important;
+        font-weight: 500 !important;
+        font-size: 0.92rem !important;
+    }
+
+    input::placeholder,
+    textarea::placeholder,
+    .el-input__inner::placeholder,
+    .el-textarea__inner::placeholder {
+        color: #94a3b8 !important;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus,
+    .vTextField:focus,
+    .el-input__inner:focus,
+    .el-textarea__inner:focus {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3) !important;
+        color: #ffffff !important;
+    }
+
+    /* 7. BARRA DE NAVEGAÇÃO, BREADCRUMBS E TÍTULOS DE TOPO */
+    .navbar {
+        background-color: #0f172a !important;
+        border-bottom: 1px solid #334155 !important;
+    }
+
+    .navbar .el-button,
+    .navbar .el-breadcrumb__inner,
+    .navbar .el-breadcrumb__separator,
+    .breadcrumbs,
+    .breadcrumbs a,
+    .el-breadcrumb__item:last-child .el-breadcrumb__inner,
+    .el-breadcrumb__item:last-child .el-breadcrumb__inner a {
+        color: #f8fafc !important;
+        font-weight: 600 !important;
+    }
+
+    .breadcrumbs a:hover,
+    .navbar .el-breadcrumb__inner a:hover {
+        color: #60a5fa !important;
+    }
+
+    /* 8. BARRA DE AÇÕES (CHANGELIST TOOLBAR) E PAGINAÇÃO */
+    #changelist #toolbar {
+        background-color: #1e2433 !important;
+        border: 1px solid #334155 !important;
+    }
+
+    #changelist .actions,
+    .actions label,
+    .actions select,
+    .actions span.all,
+    .actions span.action-counter,
+    .paginator,
+    .paginator a,
+    .el-pagination {
+        color: #f8fafc !important;
+        font-weight: 600 !important;
+    }
+
+    .el-pagination.is-background .el-pager li:not(.disabled) {
+        background-color: #1e293b !important;
+        color: #f1f5f9 !important;
+        border: 1px solid #475569 !important;
+    }
+
+    .el-pagination.is-background .el-pager li:not(.disabled).active {
+        background-color: #2563eb !important;
+        color: #ffffff !important;
+        font-weight: 700 !important;
+    }
+
+    /* 9. BOTÕES E LINKS DO ELEMENT-UI NO ADMIN */
+    .el-link-btn,
+    .el-button--text {
+        color: #60a5fa !important;
+        font-weight: 600 !important;
+    }
+
+    .el-link-btn:hover,
+    .el-button--text:hover {
+        color: #93c5fd !important;
+        text-decoration: underline !important;
+    }
+
+    .el-button--default {
+        background-color: #1e293b !important;
+        border-color: #475569 !important;
+        color: #f8fafc !important;
+        font-weight: 600 !important;
+    }
+
+    .el-button--default:hover {
+        background-color: #334155 !important;
+        border-color: #64748b !important;
+        color: #ffffff !important;
+    }
+
+    /* 10. TELA INICIAL (DASHBOARD SIMPLEUI) */
+    .quick-wrap a,
+    .quick-wrap .card-name,
+    .quick-card a,
+    .box-card .card-name {
+        color: #f8fafc !important;
+        font-weight: 600 !important;
+    }
+
+    .quick-wrap a:hover .card-name {
+        color: #60a5fa !important;
+    }
+
+    .info-card .el-card {
+        background-color: #1e2433 !important;
+        border: 1px solid #334155 !important;
+        color: #f8fafc !important;
+    }
+}
+
+/* ------------------------------------------------------------------------------
+   11. REALCE ESPECÍFICO PARA TEMAS ESCUROS (ANT DESIGN, BLACK, DARK GREEN, E-BLACK)
+   ------------------------------------------------------------------------------ */
+body[data-theme="dark"],
+html[data-theme="dark"],
+body.theme-black,
+body.theme-e-black,
+body.theme-dark-green,
+body.theme-e-black-pro {
+    color: #f8fafc !important;
+}
+
+body[data-theme="dark"] label,
+html[data-theme="dark"] label,
+body.theme-black label,
+body.theme-e-black label,
+body.theme-dark-green label {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+/* 12. REALCE DO MENU LATERAL (SIDEBAR) EM TEMAS ESCUROS (EX: ANT DESIGN PRO #000b16) */
+.menu,
+.el-menu {
+    border-right: none !important;
+}
+
+.menu .el-menu-item,
+.menu .el-submenu__title {
+    color: #f1f5f9 !important;
+    font-weight: 500 !important;
+    font-size: 0.93rem !important;
+}
+
+.menu .el-menu-item i,
+.menu .el-submenu__title i {
+    color: #cbd5e1 !important;
+}
+
+.menu .el-menu-item:hover,
+.menu .el-submenu__title:hover {
+    color: #ffffff !important;
+    background-color: rgba(59, 130, 246, 0.22) !important;
+}
+
+.menu .el-menu-item.is-active {
+    color: #38bdf8 !important;
+    font-weight: 700 !important;
+    background-color: rgba(56, 189, 248, 0.16) !important;
+}
+
+.logo-wrap {
+    font-weight: 700 !important;
+    letter-spacing: 0.02em !important;
+}
