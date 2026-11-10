@@ -73,7 +73,7 @@ urlpatterns = [
             'AUTH_PASSWORD_RESET_RATE_LIMIT',
             window=900,
             subject_field='email',
-        )(auth_views.PasswordResetView.as_view(template_name="loja/password_reset_form.html")),
+        )(views.RecuperarSenhaView.as_view()),
         name='password_reset',
     ),
 

@@ -1,24 +1,42 @@
 {% extends "loja/base.html" %}
 
-{% block title %}E-mail Enviado - MiraComerce{% endblock %}
+{% block title %}E-mail Enviado - MiraComerce IA{% endblock %}
 
 {% block content %}
-<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
-    <div class="card shadow-lg border-0 rounded-4 text-center" style="max-width: 500px; width: 100%;">
-        <div class="card-body p-5">
-            <div class="mb-4">
-                <i class="fas fa-paper-plane fa-4x text-warning animate__animated animate__bounceIn"></i>
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh; padding: 2rem 0;">
+    <div class="card shadow-lg border-0 rounded-4 text-center" style="max-width: 520px; width: 100%; border-radius: 16px; overflow: hidden;">
+        <div class="card-header border-0 py-4" style="background: var(--dark-gray); color: white;">
+            <div class="mb-2">
+                <i class="fas fa-paper-plane fa-3x" style="color: var(--primary-orange);"></i>
             </div>
-            <h2 class="fw-bold mb-3">Verifique seu E-mail</h2>
-            <p class="text-muted">
-                Enviamos um link de recuperação para o endereço informado. 
-                Se o e-mail não aparecer em alguns minutos, verifique a sua pasta de <strong>Spam</strong>.
+            <h3 class="fw-bold mb-0">E-mail Despachado!</h3>
+            <p class="small opacity-75 mb-0">Instruções para redefinir a sua palavra-passe</p>
+        </div>
+
+        <div class="card-body p-4 p-md-5">
+            <p class="text-secondary mb-3 fs-6">
+                Se a conta informada estiver registada na nossa base de dados, acabámos de enviar um e-mail com o link de recuperação.
             </p>
-            <hr class="my-4">
-            <p class="small text-muted mb-4">Após redefinir sua senha, você poderá acessar sua conta normalmente.</p>
-            <a href="{% url 'login' %}" class="btn btn-dark rounded-pill px-4">
-                Voltar para o Login
-            </a>
+
+            <div class="alert alert-light border text-start small mb-4 p-3 rounded-3" style="background-color: #f8fafc;">
+                <div class="d-flex align-items-start mb-2">
+                    <i class="fas fa-clock text-warning me-2 mt-1"></i>
+                    <span><strong>Validade:</strong> O link enviado expira em 24 horas por razões de segurança.</span>
+                </div>
+                <div class="d-flex align-items-start">
+                    <i class="fas fa-folder-open text-warning me-2 mt-1"></i>
+                    <span><strong>Atenção:</strong> Se não encontrar o e-mail na Caixa de Entrada, consulte a pasta de <strong>Spam / Lixo Eletrónico</strong>.</span>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2">
+                <a href="{% url 'login' %}" class="btn btn-dark rounded-pill py-2 fw-bold">
+                    <i class="fas fa-arrow-left me-2"></i> Voltar ao Login
+                </a>
+                <a href="{% url 'password_reset' %}" class="btn btn-outline-secondary rounded-pill py-2 small">
+                    Não recebeu? Tentar novamente
+                </a>
+            </div>
         </div>
     </div>
 </div>

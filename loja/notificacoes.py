@@ -143,10 +143,8 @@ def enviar_email_notificacao_status(pedido_id, status_novo, status_anterior=None
     perfil = getattr(pedido.usuario, 'perfil', None)
 
     caminho_rastreio = reverse('detalhe_pedido', args=[pedido.id])
-    if site_url:
-        url_rastreio = f"{site_url.rstrip('/')}{caminho_rastreio}"
-    else:
-        url_rastreio = f"http://127.0.0.1:8000{caminho_rastreio}"
+    site_base = site_url or getattr(settings, 'SITE_URL', 'https://miracommerce.vercel.app')
+    url_rastreio = f"{site_base.rstrip('/')}{caminho_rastreio}"
 
     contexto = {
         'pedido': pedido,
@@ -173,7 +171,7 @@ def enviar_email_notificacao_status(pedido_id, status_novo, status_anterior=None
         mensagem = EmailMultiAlternatives(
             subject=assunto,
             body=texto_corpo,
-            from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'MiraComerce IA <nao-responder@miracommerce.ao>'),
+            from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', None),
             to=[destinatario_email],
         )
         mensagem.attach_alternative(html_corpo, 'text/html')
@@ -235,7 +233,7 @@ def gerar_link_whatsapp_cliente(pedido, site_url=None):
 
     meta = obter_metadados_status(pedido.status)
     caminho_rastreio = reverse('detalhe_pedido', args=[pedido.id])
-    base_url = (site_url or "http://127.0.0.1:8000").rstrip("/")
+    base_url = (site_url or getattr(settings, 'SITE_URL', 'https://miracommerce.vercel.app')).rstrip("/")
     url = f"{base_url}{caminho_rastreio}"
 
     nome_cliente = pedido.usuario.get_full_name() or pedido.usuario.username
@@ -258,7 +256,7 @@ def gerar_link_whatsapp_suporte(pedido, site_url=None):
     """
     telefone_suporte = getattr(settings, 'SUPORTE_WHATSAPP_NUMERO', '244923000000')
     caminho_rastreio = reverse('detalhe_pedido', args=[pedido.id])
-    base_url = (site_url or "http://127.0.0.1:8000").rstrip("/")
+    base_url = (site_url or getattr(settings, 'SITE_URL', 'https://miracommerce.vercel.app')).rstrip("/")
     url = f"{base_url}{caminho_rastreio}"
 
     texto = (

@@ -13,6 +13,7 @@ from uuid import UUID, uuid4
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages 
 from django.db import transaction, IntegrityError
+from django.contrib.auth import views as auth_views
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -22,7 +23,7 @@ from django.views.decorators.http import require_POST
 
 # Importações locais
 from .models import Pedido, Produto, Venda, Perfil, Categoria, SubCategoria, ZonaEntrega
-from .forms import CadastroForm, DefinicoesForm
+from .forms import CadastroForm, DefinicoesForm, RecuperarSenhaForm
 from .tasks import enqueue_recommendation_refresh
 from .privacy import anonimizar_usuario, exportar_dados_usuario
 from .services import (
@@ -838,6 +839,30 @@ def cadastro(request):
     else:
         form = CadastroForm()
     return render(request, 'loja/cadastro.html', {'form': form})
+
+
+class RecuperarSenhaView(auth_views.PasswordResetView):
+    """
+    Controlador de recuperação de palavra-passe com templates transacionais
+    HTML/texto, suporte a e-mail ou username e tratamento resiliente de erros SMTP.
+    """
+    form_class = RecuperarSenhaForm
+    template_name = 'loja/password_reset_form.html'
+    email_template_name = 'loja/emails/recuperar_senha_email.txt'
+    html_email_template_name = 'loja/emails/recuperar_senha_email.html'
+    subject_template_name = 'loja/emails/recuperar_senha_assunto.txt'
+
+    def form_valid(self, form):
+        try:
+            return super().form_valid(form)
+        except Exception as exc:
+            logger.exception("Falha na tentativa de envio de e-mail de recuperação: %s", exc)
+            messages.error(
+                self.request,
+                "Não foi possível contactar o servidor de e-mail no momento. "
+                "Por favor, tente novamente em instantes ou contacte o suporte."
+            )
+            return redirect('password_reset')
 
 def carrinho_global(request):
     try:

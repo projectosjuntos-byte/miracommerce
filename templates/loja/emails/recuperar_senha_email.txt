@@ -1,0 +1,19 @@
+Olá, {{ user.get_full_name|default:user.username }}!
+
+Recebemos um pedido para redefinir a palavra-passe da sua conta na MiraComerce IA.
+
+Para escolher uma nova palavra-passe, aceda ao seguinte endereço:
+{{ reset_url }}
+
+Informações da Conta:
+- Utilizador: {{ user.username }}
+- E-mail: {{ email }}
+
+IMPORTANTE:
+Este link é pessoal, intransmissível e expira em 24 horas.
+Se não solicitou a recuperação da palavra-passe, pode ignorar este e-mail. A sua conta e senha continuam totalmente seguras.
+
+Atenciosamente,
+Equipa MiraComerce IA
+Luanda, Angola
+{{ site_url }}

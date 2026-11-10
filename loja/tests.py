@@ -657,6 +657,35 @@ class CadastroAndPasswordResetTests(TestCase):
         self.assertRedirects(response, reverse('password_reset_done'))
         self.assertEqual(len(mail.outbox), 0)
 
+    @override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
+    def test_recuperacao_de_senha_por_nome_de_utilizador(self):
+        usuario = get_user_model().objects.create_user(
+            username='cliente_reset_user',
+            email='cliente.reset@exemplo.com',
+            password='SenhaAntiga#2026',
+        )
+
+        response = self.client.post(
+            reverse('password_reset'),
+            {'email': 'cliente_reset_user'},
+        )
+        self.assertRedirects(response, reverse('password_reset_done'))
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ['cliente.reset@exemplo.com'])
+        self.assertIn('cliente_reset_user', mail.outbox[0].body)
+        self.assertIn('MiraComerce IA', mail.outbox[0].subject)
+        self.assertGreater(len(mail.outbox[0].alternatives), 0)
+
+    @override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
+    def test_comando_test_email_executa_com_sucesso(self):
+        from django.core.management import call_command
+        from io import StringIO
+        out = StringIO()
+        call_command('test_email', 'alvo@teste.com', stdout=out)
+        self.assertIn('SUCESSO', out.getvalue())
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ['alvo@teste.com'])
+
     @override_settings(AUTH_LOGIN_RATE_LIMIT=1)
     def test_login_tem_limite_de_tentativas(self):
         cache.clear()

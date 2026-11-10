@@ -367,20 +367,53 @@ SIMPLEUI_ICON = {
     'Zonas de entrega': 'fas fa-map-location-dot',
 }
 
-# Em desenvolvimento ou sem credenciais SMTP, exibe os e-mails no console.
-# Em produção com credenciais configuradas, utiliza o envio SMTP real.
+# ==============================================================================
+# CONFIGURAÇÃO DE DOMÍNIO E URL PÚBLICA
+# ==============================================================================
+SITE_URL = os.environ.get(
+    'SITE_URL',
+    'https://miracommerce.vercel.app' if not DEBUG else 'http://127.0.0.1:8000'
+).rstrip('/')
+
+# Suporte completo a proxies reversos (Vercel / Cloudflare)
+USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_PORT = True
+
+# ==============================================================================
+# CONFIGURAÇÃO DE E-MAIL TRANSACIONAL (Gmail, Brevo, Resend, SendGrid, etc.)
+# ==============================================================================
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '').strip()
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '').strip()
-
-if not EMAIL_HOST_PASSWORD or EMAIL_HOST_USER in ('seu-email@gmail.com', ''):
-    EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
-else:
-    EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
-
-EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com').strip()
 EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() in ('1', 'true', 'yes', 'on')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER or 'MiraComerce IA <no-reply@miracommerce.app>')
+
+# Ajuste automático de TLS / SSL por porta (465 = SSL, 587 = TLS)
+_default_use_ssl = (EMAIL_PORT == 465)
+_default_use_tls = (EMAIL_PORT == 587)
+EMAIL_USE_SSL = _env_bool('EMAIL_USE_SSL', _default_use_ssl)
+EMAIL_USE_TLS = _env_bool('EMAIL_USE_TLS', _default_use_tls) if not EMAIL_USE_SSL else False
+
+# Timeout em segundos para evitar bloqueio de workers / Serverless
+EMAIL_TIMEOUT = int(os.environ.get('EMAIL_TIMEOUT', '10'))
+
+# Backend de e-mail flexível e seguro:
+_env_email_backend = os.environ.get('EMAIL_BACKEND', '').strip()
+if _env_email_backend:
+    EMAIL_BACKEND = _env_email_backend
+elif EMAIL_HOST_USER and EMAIL_HOST_PASSWORD and EMAIL_HOST_USER not in ('seu-email@gmail.com', ''):
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Remetente padrão:
+_env_from_email = os.environ.get('DEFAULT_FROM_EMAIL', '').strip()
+if _env_from_email:
+    DEFAULT_FROM_EMAIL = _env_from_email
+elif EMAIL_HOST_USER and '@' in EMAIL_HOST_USER and EMAIL_HOST_USER != 'seu-email@gmail.com':
+    DEFAULT_FROM_EMAIL = f'MiraComerce IA <{EMAIL_HOST_USER}>'
+else:
+    DEFAULT_FROM_EMAIL = 'MiraComerce IA <no-reply@miracommerce.app>'
+
 SERVER_EMAIL = os.environ.get('SERVER_EMAIL', EMAIL_HOST_USER or 'no-reply@miracommerce.app')
 
 if not DEBUG and not TESTING and not IS_COLLECTSTATIC and not _env_bool('VERCEL', False):
